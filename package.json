@@ -1,0 +1,43 @@
+{
+  "name": "capto",
+  "version": "0.0.1",
+  "description": "Mail catcher for NodeJs",
+  "main": "bin/capto.js",
+  "bin": {
+    "capto": "bin/capto.js"
+  },
+  "keywords": [
+    "mail",
+    "email",
+    "smtp",
+    "capto"
+  ],
+  "dependencies": {
+    "async": "^0.9.0",
+    "commander": "^2.5.0",
+    "express": "^4.9.8",
+    "jade": "^1.6.0",
+    "lodash": "^2.4.1",
+    "mailparser": "^0.4.6",
+    "morgan": "^1.3.2",
+    "mysql": "^2.5.2",
+    "nodemailer": "^1.3.0",
+    "nodemailer-smtp-transport": "^0.1.13",
+    "orm": "dresende/node-orm2",
+    "prettysize": "0.0.3",
+    "request": "^2.47.0",
+    "serve-favicon": "^2.1.6",
+    "smtp-protocol": "^2.4.4",
+    "winston": "^0.8.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@bitbucket.org:jamiehall/mailgrab.git"
+  },
+  "author": "Jamie Hall <jstevenhall@gmail.com>",
+  "license": "GPLv3"
+}
