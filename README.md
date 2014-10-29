@@ -24,7 +24,7 @@ The backend is written in NodeJs using the Express framework and the frontend is
 The backend exposes a RESTful API:
 
 Route  | Method  | Description
-------------- | -------------
+------------- | ------------- | -----------
 /messages  | GET | Get all messages
 /messages     | DELETE | Delete all messages
 /messages     | POST | Create a message
