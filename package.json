@@ -37,7 +37,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@bitbucket.org:jamiehall/mailgrab.git"
+    "url": "git@github.com:jamhall/capto.git"
   },
   "author": "Jamie Hall <hall@ill.eu>",
   "license": "GPLv3"
