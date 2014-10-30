@@ -1,6 +1,8 @@
 # capto
 Capto runs a simple SMTP server that captures any messages sent to it and displays it in a web interface.
 
+![Screenshot](https://raw.githubusercontent.com/Flukey/capto/master/docs/screenshots/screenshot.png)
+
 > This project is under active development and may contain bugs. Feedback is very welcome. All contributions are also very welcome.
 
 #### Features
@@ -42,13 +44,27 @@ Route  | Method  | Description
  - Write tests in Mocha
  - Implement Google Chrome notification API when a new message is received
  - Implement web sockets for when a new message is received?
- - Open images in a lightviewer
-
+ - Open images in a lightbox
 
 ####Installation
 
-TODO
+> Installation instructions will follow soon
+
+The capto command offers a few options:
+
+    Usage: capto [options]
+    
+    Options:
+    
+    -h, --help                 output usage information
+    --version                  output the version number
+    --ip [address]             Set the ip address for both servers
+    --smtp-port [port]         Set the port of the smtp server (default: 9025)
+    --http-port [port]         Set the port of the http server (default: 9024)
+    --max-message-size [size]  Set the max message size the smtp server will accept in bytes
+
 
 ####License
 
 GPLv3. See LICENSE file in the source.
+
