@@ -11,14 +11,12 @@ module.exports = function (orm, db) {
     fromName: {
       type: 'text',
       required: false,
-      size: 255,
-      mapsTo: 'from_name'
+      size: 255
     },
     fromAddress: {
       type: 'text',
       required: true,
-      size: 255,
-      mapsTo: 'from_address'
+      size: 255
     },
     received: {
       type: 'date',

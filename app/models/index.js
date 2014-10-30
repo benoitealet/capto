@@ -1,6 +1,7 @@
 'use strict';
 
 var orm = require('orm'), connection = null;
+var fts = require("../services/orm-mysql-fts");
 
 function setup(db, cb) {
   require('./message')(orm, db);
@@ -21,6 +22,7 @@ module.exports = function (settings, cb) {
     }
 
     connection = db;
+    db.use(fts);
     db.settings.set('instance.returnAllErrors', true);
     db.settings.set('instance.cache', false);
     db.settings.set('instance.cacheSaveCheck', true);

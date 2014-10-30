@@ -14,7 +14,6 @@ module.exports = function (orm, db) {
     contentType: {
       type: 'text',
       required: true,
-      mapsTo: 'content_type',
       size: 250
     },
     checksum: {
@@ -25,8 +24,7 @@ module.exports = function (orm, db) {
     contentId: {
       type: 'text',
       required: true,
-      size: 255,
-      mapsTo: 'content_id'
+      size: 255
     },
     content: {
       type: 'binary',

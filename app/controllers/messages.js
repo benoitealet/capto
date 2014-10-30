@@ -23,20 +23,39 @@ module.exports = {
   all: function (req, res) {
     var limit = req.query.limit ? req.query.limit : 50,
       offset = req.query.start ? req.query.start : 0;
-    req.models.message.count({}, function (err, count) {
-      if (err) {
-        return res.status(400).json(err);
-      }
-      req.models.message.find().limit(parseInt(limit)).offset(parseInt(offset)).order("-received").only('id', 'subject', 'from_name', 'from_address', 'received', 'read', 'size').run(function (err, messages) {
-        if (err) {
-          return res.json(err);
-        }
-        var data = messages.map(function (message) {
-          return message.serialize();
+    if (req.query.q) {
+      req.models.message.match("source").against(req.query.q)
+        .limit(parseInt(limit)).offset(parseInt(offset))
+        .run(function (err, messages) {
+          if (err) {
+            return res.json(err);
+          }
+          req.models.message.match("source").against(req.query.q).run(function (err, count) {
+            var data = messages.map(function (message) {
+              return message.serialize();
+            });
+            return res.json({ data: data, totalCount: count.length });
+          });
+
         });
-        return res.json({ data: data, totalCount: count });
-      });
-    });
+    } else {
+      req.models.message.find({}).limit(parseInt(limit)).offset(parseInt(offset))
+        .order("-received").only('id', 'subject', 'fromName', 'fromAddress', 'received', 'read', 'size')
+        .run(function (err, messages) {
+          if (err) {
+            return res.json(err);
+          }
+          req.models.message.count({}, function (err, count) {
+            if (err) {
+              return res.status(400).json(err);
+            }
+            var data = messages.map(function (message) {
+              return message.serialize();
+            });
+            return res.json({ data: data, totalCount: count });
+          });
+        });
+    }
   },
   get: function (req, res) {
     var id = req.params.id;
@@ -89,13 +108,13 @@ module.exports = {
   },
   getAttachment: function (req, res) {
     var id = req.params.id,
-        attachmentId = req.params.attachmentId,
-        download = req.query.download;
+      attachmentId = req.params.attachmentId,
+      download = req.query.download;
     req.models.message_attachment.find({ 'id': attachmentId, 'message_id': id }).first(function (err, attachment) {
       if (err || !attachment) {
         return res.status(404).send('Attachment not found');
       }
-      if(download === undefined) {
+      if (download === undefined) {
         return res.status(200).json({ data: attachment.serialize() });
       }
       res.setHeader('Content-Type', attachment.contentType);

@@ -4,6 +4,7 @@ Ext.define('MailViewer.MessageGrid', {
 
   initComponent: function () {
 
+
     var MessageStore = Ext.create('Ext.data.Store', {
       storeId: 'messageStore',
       model: "Message",
@@ -22,10 +23,51 @@ Ext.define('MailViewer.MessageGrid', {
         start: 0,
         limit: 50
       },
+      remoteFilter: true,
       autoLoad: true,
       listeners: {
         load: this.onLoad,
         scope: this
+      }
+    });
+
+    Ext.define('MailViewer.MessageGrid.SearchTrigger', {
+      extend: 'Ext.form.field.Text',
+      alias: 'widget.messagegridsearchtrigger',
+      triggerCls: 'x-form-clear-trigger',
+      trigger2Cls: 'x-form-search-trigger',
+      width: 300,
+      triggers: {
+        search: {
+          cls: 'x-form-search-trigger',
+          handler: function () {
+            this.performQuery(this.getValue())
+          }
+        },
+        clear: {
+          cls: 'x-form-clear-trigger',
+          handler: function () {
+            this.setValue('');
+            this.performQuery(null);
+          }
+        }
+      },
+      performQuery: function (query) {
+        var store = MessageStore;
+        if (query) {
+          store.proxy.extraParams.q = query;
+          store.reload();
+        } else {
+          delete store.proxy.extraParams.q;
+          store.reload(;
+        }
+      },
+      listeners: {
+        specialKey: function (textfield, e) {
+          if (e.getCharCode() == Ext.EventObject.ENTER) {
+            this.performQuery(this.getValue());
+          }
+        }
       }
     });
 
@@ -49,50 +91,48 @@ Ext.define('MailViewer.MessageGrid', {
       layout: 'fit',
       reserveScrollbar: true,
       sortableColumns: false,
-      dockedItems: [
+      tbar: [
         {
-          title: 'jamie',
-          xtype: 'toolbar',
-          dock: 'top',
-          items: [
-            {
-              xtype: 'button',
-              text: 'Refresh messages',
-              icon: '/images/refresh.png',
-              handler: function () {
-                MessageStore.reload();
-              }
-            },
-            {
-              xtype: 'tbfill'
-            },
-            {
-              xtype: 'button',
-              text: 'Clear messages',
-              icon: '/images/trash.png',
-              handler: function () {
-                Ext.Msg.show({
-                  title: 'Delete all messages?',
-                  message: 'Are you sure you want to delete all the messages? They will be permanently deleted',
-                  buttons: Ext.Msg.YESNO,
-                  icon: Ext.Msg.QUESTION,
-                  fn: function (btn) {
-                    if (btn === 'yes') {
-                      Ext.Ajax.request({
-                        url: '/messages',
-                        method: 'DELETE',
-                        success: function () {
-                          MessageStore.reload();
-                        }, failure: function () {
-                          Ext.Msg.alert('Error', 'Couldn\'t delete the messages :-(');
-                        }
-                      });
+          xtype: 'button',
+          text: 'Refresh messages',
+          icon: '/images/refresh.png',
+          handler: function () {
+            MessageStore.reload();
+          }
+        },
+        {
+          xtype: 'messagegridsearchtrigger',
+          autoSearch: false,
+          emptyText: 'Search for an email...'
+        },
+        {
+          xtype: 'tbfill'
+        },
+        {
+          xtype: 'button',
+          text: 'Clear messages',
+          icon: '/images/trash.png',
+          handler: function () {
+            Ext.Msg.show({
+              title: 'Delete all messages?',
+              message: 'Are you sure you want to delete all the messages? They will be permanently deleted',
+              buttons: Ext.Msg.YESNO,
+              icon: Ext.Msg.QUESTION,
+              fn: function (btn) {
+                if (btn === 'yes') {
+                  Ext.Ajax.request({
+                    url: '/messages',
+                    method: 'DELETE',
+                    success: function () {
+                      MessageStore.reload();
+                    }, failure: function () {
+                      Ext.Msg.alert('Error', 'Couldn\'t delete the messages :-(');
                     }
-                  }
-                });
+                  });
+                }
               }
-            }
-          ]
+            });
+          }
         }
       ],
       columns: [
@@ -320,4 +360,5 @@ Ext.define('MailViewer.MessageGrid', {
     }
     return value;
   }
-});
+})
+;
