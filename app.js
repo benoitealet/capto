@@ -84,6 +84,7 @@ var smtpServer = smtp.createServer(function (req) {
     });
 
     stream.on('end', function () {
+      logger.info('[SMTP] Receieved message from: %s (%d)', req.from, emailData.length);
       request.post({
         url: 'http://localhost:9024/messages',
         body: emailData

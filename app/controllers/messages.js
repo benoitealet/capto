@@ -89,16 +89,19 @@ module.exports = {
       return res.status(200).end(message.source);
     });
   },
-  downloadAttachment: function (req, res) {
+  getAttachment: function (req, res) {
     var id = req.params.id,
-      attachmentId = req.params.attachmentId;
+        attachmentId = req.params.attachmentId,
+        download = req.query.download;
     req.models.message_attachment.find({ 'id': attachmentId, 'message_id': id }).first(function (err, attachment) {
       if (err || !attachment) {
         return res.status(404).send('Attachment not found');
       }
+      if(download === undefined) {
+        return res.status(200).json({ data: attachment.serialize() });
+      }
       res.setHeader('Content-Type', attachment.contentType);
       res.setHeader('Content-disposition', 'attachment; filename=' + attachment.name);
-
       return res.status(200).send(attachment.content);
     });
   },

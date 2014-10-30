@@ -16,6 +16,6 @@ router.get('/messages/:id/html', controllers.messages.getHtml);
 router.put('/messages/:id', controllers.messages.update);
 router.delete('/messages', controllers.messages.deleteAll);
 router.get('/messages/:id/source.eml', controllers.messages.downloadSource);
-router.get('/messages/:id/attachments/:attachmentId', controllers.messages.downloadAttachment);
+router.get('/messages/:id/attachments/:attachmentId', controllers.messages.getAttachment);
 
 module.exports = router;

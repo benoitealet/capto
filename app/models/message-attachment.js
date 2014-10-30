@@ -1,5 +1,5 @@
 'use strict';
-
+var pretty = require('prettysize');
 module.exports = function (orm, db) {
   var MessageAttachment = db.define('message_attachment', {
     name: {
@@ -40,6 +40,7 @@ module.exports = function (orm, db) {
           id: this.id,
           name: this.name,
           size: this.size,
+          humanSize: pretty(this.size),
           contentType: this.contentType,
           checksum: this.checksum,
           contentId: this.contentId
