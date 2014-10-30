@@ -48,7 +48,7 @@ Route  | Method  | Description
  - Open images in a lightbox
  - ~~Implement full text search~~
  - Implement column sorting (received, subject etc.)
- - Implement CLI entry point (.ie. bin/capto)
+ - ~~Implement CLI entry point (.ie. bin/capto)~~
 
 ####Installation
 
