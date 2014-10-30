@@ -1,7 +1,17 @@
 'use strict';
 
 var settings = {
-  database: 'mysql://capto:capto@localhost/capto'
+  database: 'mysql://capto:capto@localhost/capto?debug=false',
+  smtp: {
+    port: 9025,
+    ip: '127.0.0.1',
+    // defaults to 25mb
+    maxMessageSize: 25000000
+  },
+  http: {
+    port: 9024,
+    ip: '127.0.0.1'
+  }
 };
 
 module.exports = settings;
