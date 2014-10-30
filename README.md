@@ -45,6 +45,9 @@ Route  | Method  | Description
  - Implement Google Chrome notification API when a new message is received
  - Implement web sockets for when a new message is received?
  - Open images in a lightbox
+ - Implement full text search
+ - Implement column sorting (received, subject etc.)
+ - Implement CLI entry point (.ie. bin/capto)
 
 ####Installation
 
@@ -67,4 +70,3 @@ The capto command offers a few options:
 ####License
 
 GPLv3. See LICENSE file in the source.
-
