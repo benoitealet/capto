@@ -10,6 +10,7 @@ Capto runs a simple SMTP server that captures any messages sent to it and displa
  - Catches all mail and stores it for display.
  - Displays recipients, CCs and BCCs
  - Keyboard navigation between messages
+ - Full text searching for messages
  - Shows HTML, Plain Text and Source version of messages, as applicable.
  - List attachments and download each attachment
  - Download email source
@@ -45,7 +46,7 @@ Route  | Method  | Description
  - Implement Google Chrome notification API when a new message is received
  - Implement web sockets for when a new message is received?
  - Open images in a lightbox
- - Implement full text search
+ - ~~Implement full text search~~
  - Implement column sorting (received, subject etc.)
  - Implement CLI entry point (.ie. bin/capto)
 
