@@ -54,22 +54,54 @@ Route  | Method  | Description
 
 ####Installation
 
-> Installation instructions will follow soon
+> Capto requires a MySQL database. The code project was originally designed to use SQLite, however, due to nodes asynchronous nature,  database writes were failing when multiple requests were sent in quick succession. 
 
-The capto command offers a few options:
+To get started, install capto(may require sudo):
 
-    Usage: capto [options]
+    npm install -g capto
+
+Change directory to the *node modules* directory:
+
+    cd /usr/local/lib/node_modules/capto/app/config/
+
+Copy the *settings.js.example* to *settings.js*
+
+Change the settings to your MySQL database (make sure you've created the database). Then run:
+
+    capto db:setup
+
+Your database should now be ready. To run the HTTP and SMTP server run:
+
+    capto run
+
+Now open: http://localhost:9024 to view the web interface. Send messages to *smtp://127.0.0.1:1025*.
+
+> Please note: The default max message size is 25mb. You can send a message greater than this value and the SMTP server will accept it, however, once processed it will be rejected and will not be persisted to the database. You can increase or decrease this default value in the *settings.js* file or pass in the option *--max-message-length* when running the *capto run* command.
+
+The *capto run* command offers a few options:
+
+      capto run --help
     
-    Options:
+      Usage: run [options]
     
-    -h, --help                 output usage information
-    --version                  output the version number
-    --ip [address]             Set the ip address for both servers
-    --smtp-port [port]         Set the port of the smtp server (default: 9025)
-    --http-port [port]         Set the port of the http server (default: 9024)
-    --max-message-size [size]  Set the max message size the smtp server will accept in bytes
+      Options:
+    
+        -h, --help                 output usage information
+        --smtp-ip [address]        Set the ip address for the http server
+        --http-ip [address]        Set the ip address for the smtp server
+        --smtp-port [port]         Set the port of the smtp server
+        --http-port [port]         Set the port of the http server
+        --max-message-size [size]  Set the max message size the smtp server will accept in bytes
 
+#### Thanks
+
+Many thanks to @sj26 for his excellent [mailcatcher](https://github.com/sj26/mailcatcher) project for the inspiration for this project.
+
+Many thanks also goes to the many developers who have contributed to the various libraries used in this project.
 
 ####License
 
 GPLv3. See LICENSE file in the source.
+
+
+
