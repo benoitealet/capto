@@ -60,7 +60,7 @@ program.command('db:setup')
         if (err) {
           console.error('Error creating message', err);
         } else {
-          console.log('Create database successfully');
+          console.log('Created database successfully');
         }
         db.close();
       });
