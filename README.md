@@ -5,6 +5,8 @@ Capto runs a simple SMTP server that captures any messages sent to it and displa
 
 > This project is under active development and may contain bugs. Feedback is very welcome. All contributions are also very welcome.
 
+[![NPM](https://nodei.co/npm/capto.png)](https://nodei.co/npm/capto/)
+
 #### Features
 
  - Catches all mail and stores it for display.
