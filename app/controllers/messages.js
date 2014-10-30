@@ -1,8 +1,7 @@
 'use strict';
-var _ = require('lodash');
-var logger = require('../services/logger');
-var MailParser = require("mailparser").MailParser;
-var messageService = require('../services/message')
+var _ = require('lodash'),
+  logger = require('../services/logger'),
+  MailParser = require("mailparser").MailParser;
 module.exports = {
   create: function (req, res) {
     var MessageBuilder = require('../services/message-builder');
@@ -13,7 +12,6 @@ module.exports = {
       var builder = new MessageBuilder(mail, data);
       messageService.create(builder, function (err, message) {
         if (err) {
-          logger.error(err);
           return res.send('Error :-(');
         }
         return res.send('created');

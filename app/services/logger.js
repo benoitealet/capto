@@ -1,6 +1,7 @@
 'use strict';
 
 var logger = require('winston');
+
 logger.addColors({
   debug: 'green',
   info: 'cyan',
@@ -10,9 +11,23 @@ logger.addColors({
 
 logger.remove(logger.transports.Console);
 
-logger.add(logger.transports.Console, {
-  level: 'debug',
-  colorize: true
+logger.loggers.add('smtp', {
+  console: {
+    level: 'debug',
+    colorize: 'true',
+    label: 'smtp'
+  }
 });
 
-module.exports = logger;
+logger.loggers.add('http', {
+  console: {
+    level: 'debug',
+    colorize: 'true',
+    label: 'http'
+  }
+});
+// expose our two different loggers
+module.exports = {
+  smtp: logger.loggers.get('smtp'),
+  http: logger.loggers.get('http')
+};

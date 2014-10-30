@@ -1,5 +1,5 @@
 module.exports = function (models) {
-  var logger = require('./logger'),
+  var logger = require('./logger').http,
     async = require('async');
   var createAttachments = function (message, attachments, done) {
     if (attachments === null) {
@@ -81,6 +81,7 @@ module.exports = function (models) {
             logger.error('Error creating message', err);
             return done(err, message);
           }
+          logger.info('Persisted message into database', message.id);
           return done(null, message);
         });
       });

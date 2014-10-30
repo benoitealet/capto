@@ -72,11 +72,12 @@ app.use(function (err, req, res, next) {
 app.set('port', process.env.PORT || 9024);
 
 var server = app.listen(app.get('port'), function () {
-  logger.info('Express server listening on', server.address().port);
+  logger.http.info('Express server listening on', server.address().port);
 });
 
 var smtpServer = smtp.createServer(function (req) {
   var emailData = '';
+
   req.on('message', function (stream, ack) {
     ack.accept();
     stream.on('data', function (chunk) {
@@ -84,7 +85,7 @@ var smtpServer = smtp.createServer(function (req) {
     });
 
     stream.on('end', function () {
-      logger.info('[SMTP] Receieved message from: %s (%d)', req.from, emailData.length);
+      logger.smtp.info('Receieved message from: %s (%d)', req.from, emailData.length);
       request.post({
         url: 'http://localhost:9024/messages',
         body: emailData
@@ -94,5 +95,5 @@ var smtpServer = smtp.createServer(function (req) {
 });
 
 smtpServer.listen(9025, function () {
-  logger.info('SMTP server listening on', smtpServer.address().port);
+  logger.smtp.info('SMTP server listening on', smtpServer.address().port);
 });
