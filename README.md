@@ -1,5 +1,8 @@
 # capto
-Capto runs a simple SMTP server that captures any messages sent to it and displays it in a web interface.
+
+#### Development email testing made easy
+
+Capto runs a simple SMTP server that captures any messages sent to it and displays it in a web interface.  No messages are relayed to any email addresses.
 
 ![Screenshot](https://raw.githubusercontent.com/Flukey/capto/master/docs/screenshots/screenshot.png)
 
@@ -56,7 +59,7 @@ Route  | Method  | Description
 
 > Capto requires a MySQL database. The code project was originally designed to use SQLite, however, due to nodes asynchronous nature,  database writes were failing when multiple requests were sent in quick succession. 
 
-To get started, install capto(may require sudo):
+To get started, install capto (may require sudo privileges):
 
     npm install -g capto
 
@@ -95,7 +98,7 @@ The *capto run* command offers a few options:
 
 #### Thanks
 
-Many thanks to @sj26 for his excellent [mailcatcher](https://github.com/sj26/mailcatcher) project for the inspiration for this project.
+Many thanks to [sj26](https://github.c/sj26) for his excellent [mailcatcher](https://github.com/sj26/mailcatcher) project for the inspiration for this project.
 
 Many thanks also goes to the many developers who have contributed to the various libraries used in this project.
 
