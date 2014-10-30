@@ -59,7 +59,7 @@ Ext.define('MailViewer.MessageGrid', {
           store.reload();
         } else {
           delete store.proxy.extraParams.q;
-          store.reload(;
+          store.reload();
         }
       },
       listeners: {
