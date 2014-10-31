@@ -1,6 +1,6 @@
 {
   "name": "capto",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Mail catcher for NodeJs",
   "main": "bin/capto.js",
   "preferGlobal": true,
@@ -11,7 +11,11 @@
     "mail",
     "email",
     "smtp",
-    "capto"
+    "capto",
+    "e-mail",
+    "development",
+    "testing",
+    "catcher"
   ],
   "dependencies": {
     "async": "^0.9.0",
@@ -35,6 +39,9 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/jamhall/capto/issues"
   },
   "repository": {
     "type": "git",
