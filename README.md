@@ -78,7 +78,7 @@ Your database should now be ready. To run the HTTP and SMTP server run:
 
     capto run
 
-Now open: http://localhost:9024 to view the web interface. Send messages to *smtp://127.0.0.1:1025*.
+Now open: http://localhost:9024 to view the web interface. Send messages to *smtp://127.0.0.1:9025*.
 
 > Please note: The default max message size is 25mb. You can send a message greater than this value and the SMTP server will accept it, however, once processed it will be rejected and will not be persisted to the database. You can increase or decrease this default value in the *settings.js* file or pass in the option *--max-message-length* when running the *capto run* command.
 

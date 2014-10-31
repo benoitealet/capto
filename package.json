@@ -3,6 +3,7 @@
   "version": "0.0.2",
   "description": "Mail catcher for NodeJs",
   "main": "bin/capto.js",
+  "preferGlobal": true,
   "bin": {
     "capto": "bin/capto.js"
   },

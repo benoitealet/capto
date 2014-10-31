@@ -41,7 +41,7 @@ Ext.define('MailViewer.MessageContainer', {
           inTab: true,
           xtype: 'message',
           itemId: 'message_' + rec.get('id'),
-          title: rec.get('subject'),
+          title: Ext.util.Format.ellipsis(rec.get('subject'), 30),
           closable: true,
           data: rec.data,
           active: rec
