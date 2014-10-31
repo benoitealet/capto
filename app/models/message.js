@@ -90,7 +90,6 @@ module.exports = function (orm, db) {
           headers = [];
         }
 
-
         return {
           id: this.id,
           subject: this.subject,

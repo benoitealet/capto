@@ -294,12 +294,9 @@ Ext.define('MailViewer.MessageGrid', {
   },
   onRowKeyDown: function (view, record, item, index, e) {
     if (e.getKey() === Ext.EventObject.DELETE) {
-      this.getStore().removeAt(index);
-      this.getSelectionModel().select(index++);
+      this.deleteMessage(view, record);
     }
   },
-
-
   /**
    * React to a grid item being selected
    * @private
