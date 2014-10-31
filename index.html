@@ -196,6 +196,41 @@
 </code></pre>
 
 <h4>
+<a name="configure-your-project" class="anchor" href="#configure-your-project"><span class="octicon octicon-link"></span></a>Configure your project</h4>
+
+<p>Configure your application to send emails via port 9025 and open <a href="http://localhost:9024">http://localhost:9024</a> in your browser.</p>
+
+<h5>
+<a name="rails" class="anchor" href="#rails"><span class="octicon octicon-link"></span></a>Rails</h5>
+
+<pre><code>config.action_mailer.delivery_method = :smtp
+config.action_mailer.smtp_settings = { :address =&gt; "localhost", :port =&gt; 1025 }
+</code></pre>
+
+<h5>
+<a name="nodemailer" class="anchor" href="#nodemailer"><span class="octicon octicon-link"></span></a>Nodemailer</h5>
+
+<pre><code>var nodemailer = require('nodemailer');
+var smtpTransport = require('nodemailer-smtp-transport');
+var transporter = nodemailer.createTransport(smtpTransport({
+  host: 'localhost',
+  port: 9025,
+  ignoreTLS: true
+}));
+</code></pre>
+
+<h5>
+<a name="django" class="anchor" href="#django"><span class="octicon octicon-link"></span></a>Django</h5>
+
+<pre><code>if DEBUG:
+    EMAIL_HOST = '127.0.0.1'
+    EMAIL_HOST_USER = ''
+    EMAIL_HOST_PASSWORD = ''
+    EMAIL_PORT = 1025
+    EMAIL_USE_TLS = False
+</code></pre>
+
+<h4>
 <a name="thanks" class="anchor" href="#thanks"><span class="octicon octicon-link"></span></a>Thanks</h4>
 
 <p>Many thanks to <a href="https://github.c/sj26">sj26</a> for his excellent <a href="https://github.com/sj26/mailcatcher">mailcatcher</a> project for the inspiration for this project.</p>
