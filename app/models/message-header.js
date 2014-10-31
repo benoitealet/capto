@@ -1,16 +1,16 @@
 'use strict';
 
 module.exports = function (orm, db) {
-  var MessageRecipient = db.define('message_header', {
+  var MessageHeader = db.define('message_header', {
     name: {
       type: 'text',
-      required: false,
-      size: 250
+      required: true,
+      big: true
     },
     value: {
       type: 'text',
       required: true,
-      size: 500
+      big: true
     }
   }, {
     methods: {
@@ -22,5 +22,5 @@ module.exports = function (orm, db) {
       }
     }
   });
-  MessageRecipient.hasOne('message', db.models.message, { reverse: 'headers', autoFetch: true });
+  MessageHeader.hasOne('message', db.models.message, { reverse: 'headers', autoFetch: true });
 };

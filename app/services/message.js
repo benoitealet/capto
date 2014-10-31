@@ -1,6 +1,7 @@
 module.exports = function (models) {
   var logger = require('./logger').http,
     async = require('async');
+
   var createAttachments = function (message, attachments, done) {
     if (attachments === null) {
       return done(null, message);
@@ -56,7 +57,7 @@ module.exports = function (models) {
   var createHeaders = function (message, headers, done) {
     models.message_header.create(headers, function (err, headers) {
       if (err) {
-        logger.error('Error creating headers', err);
+        logger.error('Error crsssseating headers', err);
         return done(err);
       }
       message.setHeaders(headers, function (err) {
@@ -74,7 +75,7 @@ module.exports = function (models) {
       models.message.create(builder.getMessage(), function (err, message) {
         if (err) {
           logger.error('Create message error', err);
-          return done(err, null);
+          return done(err);
         }
         async.series([
           function (callback) {

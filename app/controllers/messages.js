@@ -12,9 +12,9 @@ module.exports = {
       var builder = new MessageBuilder(mail, data);
       messageService.create(builder, function (err, message) {
         if (err) {
-          return res.send('Error :-(');
+          return res.status(500).send('Error :-(');
         }
-        return res.send('created');
+        return res.status(201).send('created');
       });
     });
     mp.write(data);

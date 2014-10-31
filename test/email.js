@@ -5,6 +5,10 @@ var Chance = require('chance');
 var chance = new Chance();
 var fs = require('fs');
 var _ = require('lodash');
+
+var nodemailer = require('nodemailer');
+var smtpTransport = require('nodemailer-smtp-transport');
+
 var transporter = nodemailer.createTransport(smtpTransport({
   host: 'localhost',
   port: 9025,
@@ -18,11 +22,11 @@ for (i = 0; i <= 1; i++) {
   transporter.sendMail({
     from: chance.name({ middle: true }) + '<' + chance.email({domain: "example.com"}) + '>',
     to: chance.name({ middle: true }) + '<' + chance.email({domain: "example.com"}) + '>',
-    subject: randomSubjects[Math.floor(Math.random()*randomSubjects.length)],
+    subject: randomSubjects[Math.floor(Math.random() * randomSubjects.length)],
     bcc: [chance.email({domain: "example.com"})],
     text: chance.paragraph({sentences: 1}),
-    cc: _.map([1,3,3,4], function() {
-        return chance.name({ middle: true }) + '<' + chance.email({domain: "example.com"}) + '>';
+    cc: _.map([1, 3, 3, 4], function () {
+      return chance.name({ middle: true }) + '<' + chance.email({domain: "example.com"}) + '>';
     }),
     html: fs.readFileSync(path.resolve(__dirname, 'resources/templates/go-confirm.html')),
     attachments: [

@@ -1,4 +1,6 @@
-var _ = require('lodash');
+var _ = require('lodash'),
+   jsesc = require('jsesc');
+
 function MessageBuilder(mail, source) {
 
   return {
@@ -72,7 +74,7 @@ function MessageBuilder(mail, source) {
     getHeaders: function () {
       var headers = [];
       Object.keys(mail.headers).forEach(function (key) {
-        headers.push({ name: key, value: mail.headers[key] });
+        headers.push({ name: key, value: jsesc(mail.headers[key])});
       });
       return headers;
     }
