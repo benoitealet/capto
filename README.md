@@ -41,7 +41,6 @@ Route  | Method  | Description
 /messages/{id}/source.eml | GET | Download the source of a message
 /messages/{id}/html |GET | Get the html of a message
 /messages/{id}/source |GET | Get the plain text of a message
-/messages/{id}/attachments |GET | List the attachments for a message (does not include content)
 /messages/{id}/attachments/{attachmentId} |GET | Get an attachment (to download append ?download to the URL)
 
 
