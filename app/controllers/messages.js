@@ -2,6 +2,7 @@
 var _ = require('lodash'),
   logger = require('../services/logger'),
   MailParser = require("mailparser").MailParser;
+
 module.exports = {
   create: function (req, res) {
     var MessageBuilder = require('../services/message-builder');
