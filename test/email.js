@@ -13,11 +13,12 @@ var transporter = nodemailer.createTransport(smtpTransport({
 /**
  * Generate some random emails
  */
+var randomSubjects = ['Order confirmation', 'Please activate your account', 'Your account has been activated!', 'Forgot password', 'Payment received', 'Hey! Don\'t miss out on these deals', 'Introducing our new design', 'New messages from Joe Bloggs'];
 for (i = 0; i <= 1; i++) {
   transporter.sendMail({
     from: chance.name({ middle: true }) + '<' + chance.email({domain: "example.com"}) + '>',
     to: chance.name({ middle: true }) + '<' + chance.email({domain: "example.com"}) + '>',
-    subject: chance.sentence(),
+    subject: randomSubjects[Math.floor(Math.random()*randomSubjects.length)],
     bcc: [chance.email({domain: "example.com"})],
     text: chance.paragraph({sentences: 1}),
     cc: _.map([1,3,3,4], function() {
