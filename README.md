@@ -13,7 +13,8 @@ Capto runs a simple SMTP server that captures any messages sent to it and displa
 #### Features
 
  - Catches all mail and stores it for display.
- - Displays recipients, CCs and BCCs
+ - Displays recipients and CCs
+ - Display headers
  - Keyboard navigation between messages
  - Full text searching for messages
  - Shows HTML, Plain Text and Source version of messages, as applicable.
