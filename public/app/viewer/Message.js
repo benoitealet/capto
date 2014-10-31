@@ -32,6 +32,9 @@ Ext.define('FeedViewer.Message', {
         } else if (t.id === 'source') {
           panel.data.viewMode = 3;
           panel.update(panel.data);
+        } else if (t.id === 'headers') {
+          panel.data.viewMode = 4;
+          panel.update(panel.data);
         }
       });
     },
@@ -63,6 +66,11 @@ Ext.define('FeedViewer.Message', {
     '<tpl else>',
     '<li id="source">Source</li>',
     '</tpl>',
+    '<tpl if="viewMode == 4">',
+    '<li id="headers" class="active-tab">Headers</li>',
+    '<tpl else>',
+    '<li id="headers">Headers</li>',
+    '</tpl>',
     '<li class="actions">',
     '<a class="download-button" href="/messages/{id}/source.eml" id="download-message"><i class="fa fa-download"></i> Download message</a>',
     '</li>',
@@ -76,6 +84,22 @@ Ext.define('FeedViewer.Message', {
     '</tpl>',
     '<tpl if="viewMode == 3">',
     '<iframe class="message-content" src="/messages/{id}/source" scrolling="yes"></iframe>',
+    '</tpl>',
+    '<tpl if="viewMode == 4">',
+    '<table class="headers">',
+    '<thead>',
+    '<tr>',
+    '<th>Name</th><th>Value</th>',
+    '</tr>',
+    '</thead>',
+    '<tbody>',
+    '<tpl for="headers">',
+    '<tr>',
+    '<td>{name}</td><td>{value}</td>',
+    '</tr>',
+    '</tpl>',
+    '</tbody>',
+    '</table>',
     '</tpl>',
     {
       defaultValue: function (v) {

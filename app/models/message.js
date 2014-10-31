@@ -47,7 +47,6 @@ module.exports = function (orm, db) {
       required: true
     }
   }, {
-    //cache: false,
     hooks: {
       beforeValidation: function () {
         if (this.received === null) {
@@ -57,7 +56,7 @@ module.exports = function (orm, db) {
     },
     methods: {
       serialize: function () {
-        var attachments, recipients, ccs;
+        var attachments, recipients, ccs, headers;
 
         if (this.attachments) {
           attachments = this.attachments.map(function (c) {
@@ -83,6 +82,15 @@ module.exports = function (orm, db) {
           ccs = [];
         }
 
+        if (this.headers) {
+          headers = this.headers.map(function (c) {
+            return c.serialize();
+          });
+        } else {
+          headers = [];
+        }
+
+
         return {
           id: this.id,
           subject: this.subject,
@@ -94,6 +102,7 @@ module.exports = function (orm, db) {
           humanSize: pretty(this.size),
           recipients: recipients,
           ccs: ccs,
+          headers: headers,
           attachments: attachments
         };
       }

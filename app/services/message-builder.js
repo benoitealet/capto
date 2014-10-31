@@ -10,6 +10,7 @@ function MessageBuilder(mail, source) {
       message.fromAddress = mail.from[0].address;
       message.subject = mail.subject;
 
+
       if (mail.html !== '') {
         message.html = mail.html;
       }
@@ -18,6 +19,7 @@ function MessageBuilder(mail, source) {
       }
       message.source = source;
       message.size = source.length;
+
       return message;
     },
     getAttachments: function () {
@@ -66,6 +68,13 @@ function MessageBuilder(mail, source) {
         }
       }
       return null;
+    },
+    getHeaders: function () {
+      var headers = [];
+      Object.keys(mail.headers).forEach(function (key) {
+        headers.push({ name: key, value: mail.headers[key] });
+      });
+      return headers;
     }
   };
 }

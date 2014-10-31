@@ -18,6 +18,7 @@ for (i = 0; i <= 1; i++) {
     from: chance.name({ middle: true }) + '<' + chance.email({domain: "example.com"}) + '>',
     to: chance.name({ middle: true }) + '<' + chance.email({domain: "example.com"}) + '>',
     subject: chance.sentence(),
+    bcc: [chance.email({domain: "example.com"})],
     text: chance.paragraph({sentences: 1}),
     cc: _.map([1,3,3,4], function() {
         return chance.name({ middle: true }) + '<' + chance.email({domain: "example.com"}) + '>';

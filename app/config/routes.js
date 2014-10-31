@@ -13,6 +13,7 @@ router.delete('/messages/:id', controllers.messages.delete);
 router.get('/messages/:id/source', controllers.messages.getSource);
 router.get('/messages/:id/plain', controllers.messages.getPlain);
 router.get('/messages/:id/html', controllers.messages.getHtml);
+//router.get('/messages/:id/headers'
 router.put('/messages/:id', controllers.messages.update);
 router.delete('/messages', controllers.messages.deleteAll);
 router.get('/messages/:id/source.eml', controllers.messages.downloadSource);

@@ -8,7 +8,7 @@ function setup(db, cb) {
   require('./message-recipient')(orm, db);
   require('./message-cc')(orm, db);
   require('./message-attachment')(orm, db);
-
+  require('./message-header')(orm, db);
   return cb(null, db);
 }
 

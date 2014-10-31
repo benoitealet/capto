@@ -53,6 +53,22 @@ module.exports = function (models) {
     });
   };
 
+  var createHeaders = function (message, headers, done) {
+    models.message_header.create(headers, function (err, headers) {
+      if (err) {
+        logger.error('Error creating headers', err);
+        return done(err);
+      }
+      message.setHeaders(headers, function (err) {
+        if (err) {
+          logger.error('Error settings headers', err);
+          return done(err);
+        }
+        return done(null);
+      });
+    });
+  };
+
   return {
     create: function (builder, done) {
       models.message.create(builder.getMessage(), function (err, message) {
@@ -61,6 +77,11 @@ module.exports = function (models) {
           return done(err, null);
         }
         async.series([
+          function (callback) {
+            createHeaders(message, builder.getHeaders(), function (err) {
+              callback(err);
+            });
+          },
           function (callback) {
             createRecipients(message, builder.getRecipients(), function (err) {
               callback(err);
@@ -81,7 +102,7 @@ module.exports = function (models) {
             logger.error('Error creating message', err);
             return done(err, message);
           }
-          logger.info('Persisted message into database', message.id);
+          logger.info('Persisted message into database with id: ', message.id);
           return done(null, message);
         });
       });

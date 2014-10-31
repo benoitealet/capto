@@ -29,7 +29,6 @@ program.command('run')
      * Instantiate new server instance
      */
     new Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize);
-    console.log(cmd.name);
   });
 program.command('db:setup')
   .action(function (cmd) {
