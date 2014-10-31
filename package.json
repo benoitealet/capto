@@ -1,6 +1,6 @@
 {
   "name": "capto",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Mail catcher for NodeJs",
   "main": "bin/capto.js",
   "preferGlobal": true,
