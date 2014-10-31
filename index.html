@@ -1,0 +1,221 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Capto by jamhall</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Capto</h1>
+        <p>Mail catcher for NodeJs</p>
+        <p class="view"><a href="https://github.com/jamhall/capto">View the Project on GitHub <small>jamhall/capto</small></a></p>
+        <ul>
+          <li><a href="https://github.com/jamhall/capto/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/jamhall/capto/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/jamhall/capto">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="capto" class="anchor" href="#capto"><span class="octicon octicon-link"></span></a>capto</h1>
+
+<h4>
+<a name="development-email-testing-made-easy" class="anchor" href="#development-email-testing-made-easy"><span class="octicon octicon-link"></span></a>Development email testing made easy</h4>
+
+<p>Capto runs a simple SMTP server that captures any messages sent to it and displays it in a web interface.  No messages are relayed to any email addresses.</p>
+
+<p><img src="https://raw.githubusercontent.com/Flukey/capto/master/docs/screenshots/screenshot.png" alt="Screenshot"></p>
+
+<blockquote>
+<p>This project is under active development and may contain bugs. Feedback is very welcome. All contributions are also very welcome.</p>
+</blockquote>
+
+<p><a href="https://nodei.co/npm/capto/"><img src="https://nodei.co/npm/capto.png" alt="NPM"></a></p>
+
+<h4>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h4>
+
+<ul>
+<li>Catches all mail and stores it for display.</li>
+<li>Displays recipients and CCs</li>
+<li>Display headers</li>
+<li>Keyboard navigation between messages</li>
+<li>Full text searching for messages</li>
+<li>Shows HTML, Plain Text and Source version of messages, as applicable.</li>
+<li>List attachments and download each attachment</li>
+<li>Download email source</li>
+<li>Open an email in a new tab (like thunderbird)</li>
+<li>Post an <em>eml</em> file via the API and view it in the interface</li>
+<li>Mark as read, delete messages and navigate messages via pagination controls</li>
+</ul>
+
+<p>The backend is written in NodeJs using the Express framework and the frontend is driven by ExtJs 5.</p>
+
+<h4>
+<a name="api" class="anchor" href="#api"><span class="octicon octicon-link"></span></a>API</h4>
+
+<p>The backend exposes a RESTful API:</p>
+
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/messages</td>
+<td>GET</td>
+<td>Get all messages</td>
+</tr>
+<tr>
+<td>/messages</td>
+<td>DELETE</td>
+<td>Delete all messages</td>
+</tr>
+<tr>
+<td>/messages</td>
+<td>POST</td>
+<td>Create a message</td>
+</tr>
+<tr>
+<td>/messages/{id}</td>
+<td>GET</td>
+<td>Get a single message</td>
+</tr>
+<tr>
+<td>/messages/{id}</td>
+<td>DELETE</td>
+<td>Delete a message</td>
+</tr>
+<tr>
+<td>/messages/{id}/source</td>
+<td>GET</td>
+<td>Get the source of a message</td>
+</tr>
+<tr>
+<td>/messages/{id}/source.eml</td>
+<td>GET</td>
+<td>Download the source of a message</td>
+</tr>
+<tr>
+<td>/messages/{id}/html</td>
+<td>GET</td>
+<td>Get the html of a message</td>
+</tr>
+<tr>
+<td>/messages/{id}/source</td>
+<td>GET</td>
+<td>Get the plain text of a message</td>
+</tr>
+<tr>
+<td>/messages/{id}/attachments</td>
+<td>GET</td>
+<td>List the attachments for a message (does not include content)</td>
+</tr>
+<tr>
+<td>/messages/{id}/attachments/{attachmentId}</td>
+<td>GET</td>
+<td>Get an attachment (to download append ?download to the URL)</td>
+</tr>
+</tbody>
+</table>
+
+<h4>
+<a name="to-do" class="anchor" href="#to-do"><span class="octicon octicon-link"></span></a>To do</h4>
+
+<ul>
+<li>Write tests in Mocha</li>
+<li>Implement Google Chrome notification API when a new message is received</li>
+<li>Implement web sockets for when a new message is received?</li>
+<li>Open images in a lightbox</li>
+<li><del>Implement full text search</del></li>
+<li>Implement column sorting (received, subject etc.)</li>
+<li><del>Implement CLI entry point (.ie. bin/capto)</del></li>
+</ul>
+
+<h4>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h4>
+
+<blockquote>
+<p>Capto requires a MySQL database. The code project was originally designed to use SQLite, however, due to nodes asynchronous nature,  database writes were failing when multiple requests were sent in quick succession. </p>
+</blockquote>
+
+<p>To get started, install capto (may require sudo privileges):</p>
+
+<pre><code>npm install -g capto
+</code></pre>
+
+<p>Change directory to the <em>node modules</em> directory:</p>
+
+<pre><code>cd /usr/local/lib/node_modules/capto/app/config/
+</code></pre>
+
+<p>Copy the <em>settings.js.example</em> to <em>settings.js</em></p>
+
+<p>Change the settings to your MySQL database (make sure you've created the database). Then run:</p>
+
+<pre><code>capto db:setup
+</code></pre>
+
+<p>Your database should now be ready. To run the HTTP and SMTP server run:</p>
+
+<pre><code>capto run
+</code></pre>
+
+<p>Now open: http://localhost:9024 to view the web interface. Send messages to <em>smtp://127.0.0.1:9025</em>.</p>
+
+<blockquote>
+<p>Please note: The default max message size is 25mb. You can send a message greater than this value and the SMTP server will accept it, however, once processed it will be rejected and will not be persisted to the database. You can increase or decrease this default value in the <em>settings.js</em> file or pass in the option <em>--max-message-length</em> when running the <em>capto run</em> command.</p>
+</blockquote>
+
+<p>The <em>capto run</em> command offers a few options:</p>
+
+<pre><code>  capto run --help
+
+  Usage: run [options]
+
+  Options:
+
+    -h, --help                 output usage information
+    --smtp-ip [address]        Set the ip address for the http server
+    --http-ip [address]        Set the ip address for the smtp server
+    --smtp-port [port]         Set the port of the smtp server
+    --http-port [port]         Set the port of the http server
+    --max-message-size [size]  Set the max message size the smtp server will accept in bytes
+</code></pre>
+
+<h4>
+<a name="thanks" class="anchor" href="#thanks"><span class="octicon octicon-link"></span></a>Thanks</h4>
+
+<p>Many thanks to <a href="https://github.c/sj26">sj26</a> for his excellent <a href="https://github.com/sj26/mailcatcher">mailcatcher</a> project for the inspiration for this project.</p>
+
+<p>Many thanks also goes to the many developers who have contributed to the various libraries used in this project.</p>
+
+<h4>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h4>
+
+<p>GPLv3. See LICENSE file in the source.</p>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/jamhall">jamhall</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
