@@ -131,6 +131,11 @@
 </tbody>
 </table>
 
+<p>To post an eml via file via Curl, do the following:</p>
+
+<pre><code>curl --noproxy localhost -X POST -H "Content-Type: text/plain" --data-binary @/path/to/file.eml http://localhost:9024/messages
+</code></pre>
+
 <h4>
 <a name="to-do" class="anchor" href="#to-do"><span class="octicon octicon-link"></span></a>To do</h4>
 
