@@ -226,12 +226,6 @@ Ext.define('MailViewer.MessageGrid', {
             view.fireEvent('rowdblclick', view, view.getStore().getAt(index));
           }
         },
-        /* {
-         icon: '/images/code.png',
-         text: 'Show message source',
-         handler: function () {
-         }
-         },*/
         {
           icon: '/images/download.png',
           text: 'Download message',
@@ -267,6 +261,11 @@ Ext.define('MailViewer.MessageGrid', {
       url: '/messages/' + record.get('id'),
       method: 'DELETE',
       success: function (response) {
+        /**
+         * Probably a better way to do this....
+         */
+        var messageContainer = Ext.getCmp('messagecontainer');
+        messageContainer.removeTab(record);
         view.getStore().reload();
       }, failure: function () {
         Ext.Msg.alert('Error', 'Couldn\'t delete message :-(');

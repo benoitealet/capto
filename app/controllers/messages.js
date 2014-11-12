@@ -2,10 +2,10 @@
 var _ = require('lodash'),
   logger = require('../services/logger'),
   MailParser = require("mailparser").MailParser;
+var MessageBuilder = require('../services/message-builder');
 
 module.exports = {
   create: function (req, res) {
-    var MessageBuilder = require('../services/message-builder');
     var messageService = require('../services/message')(req.db.models);
     var data = req.body;
     var mp = new MailParser({ debug: false });
@@ -13,9 +13,9 @@ module.exports = {
       var builder = new MessageBuilder(mail, data);
       messageService.create(builder, function (err, message) {
         if (err) {
-          return res.status(500).send('Error :-(');
+          return res.status(500).send(err);
         }
-        return res.status(201).send('created');
+        return res.status(201).send({ data: message.serialize() });
       });
     });
     mp.write(data);

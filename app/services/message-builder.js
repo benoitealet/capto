@@ -12,7 +12,6 @@ function MessageBuilder(mail, source) {
       message.fromAddress = mail.from[0].address;
       message.subject = mail.subject;
 
-
       if (mail.html !== '') {
         message.html = mail.html;
       }

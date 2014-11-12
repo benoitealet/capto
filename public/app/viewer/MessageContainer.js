@@ -2,6 +2,7 @@ Ext.define('MailViewer.MessageContainer', {
 
   extend: 'Ext.tab.Panel',
   alias: 'widget.messagecontainer',
+  id: 'messagecontainer',
   cls: 'header',
   title: '<img src="/images/logo.png" style="height: 30px">',
   maxTabWidth: 230,
@@ -58,5 +59,11 @@ Ext.define('MailViewer.MessageContainer', {
   },
   onRowDblClick: function (info, rec) {
     this.onTabOpen(null, rec);
+  },
+  removeTab: function(rec) {
+    var item = this.getTabById(rec.get('id'));
+    if (item) {
+      this.remove(item);
+    }
   }
 });

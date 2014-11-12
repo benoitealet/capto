@@ -6,9 +6,11 @@ var pkg = require('../package.json'),
   path = require('path'),
   settings = require(path.resolve(__dirname, '../app/config/settings')),
   Server = require(path.resolve(__dirname, '../server.js')),
-  async = require('async');
+  async = require('async'),
+  versionCompare = require(path.resolve(__dirname, '../app/services/version-compare')),
+  util = require('util');
 
-program.version('0.0.1', '--version');
+program.version(version, '--version');
 program.command('run')
   .option('--smtp-ip [address]', 'Set the ip address for the http server', settings.smtp.ip)
   .option('--http-ip [address]', 'Set the ip address for the smtp server', settings.http.ip)
@@ -47,11 +49,24 @@ program.command('db:setup')
             return callback(err);
           });
         }, function (callback) {
-          db.driver.execQuery("ALTER TABLE message ENGINE = MYISAM;", function (err) {
-            return callback(err);
+          db.driver.execQuery('SELECT @@innodb_version as version;', function (err, data) {
+            if (err) {
+              return callback(err);
+            }
+
+            var version = data[0].version;
+            if (versionCompare(version, '5.6') > 0) {
+              console.log(util.format('Your MySQL version %s is lower than 5.6. Falling back to MyISAM for full text searching', version));
+              db.driver.execQuery('ALTER TABLE message ENGINE = MYISAM;', function (err) {
+                return callback(err);
+              });
+            } else {
+              return callback();
+            }
           });
+
         }, function (callback) {
-          db.driver.execQuery("ALTER TABLE message ADD FULLTEXT(source);", function (err) {
+          db.driver.execQuery('ALTER TABLE message ADD FULLTEXT(source);', function (err) {
             return callback(err);
           });
         }

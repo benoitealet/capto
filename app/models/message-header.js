@@ -5,12 +5,12 @@ module.exports = function (orm, db) {
     name: {
       type: 'text',
       required: true,
-      big: true
+      size: 1000
     },
     value: {
       type: 'text',
       required: true,
-      big: true
+      size: 5000
     }
   }, {
     methods: {
