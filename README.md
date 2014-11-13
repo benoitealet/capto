@@ -13,6 +13,9 @@ Capto runs a simple SMTP server that captures any messages sent to it and displa
 #### Features
 
  - Catches all mail and stores it for display.
+ - Display inline images
+ - Get notified when a new message arrives via websockets and browser desktop notifications
+ - Display attachment images in lightbox popup
  - Displays recipients and CCs
  - Display headers
  - Keyboard navigation between messages
@@ -42,15 +45,16 @@ Route  | Method  | Description
 /messages/{id}/html |GET | Get the html of a message
 /messages/{id}/source |GET | Get the plain text of a message
 /messages/{id}/attachments/{attachmentId} |GET | Get an attachment (to download append ?download to the URL)
+/messages/{id}/headers |GET | Get the headers for a message (for a html representation append ?html to the URL)
 
 
 #### To do
 
 
  - Write tests in Mocha
- - Implement Google Chrome notification API when a new message is received
- - Implement web sockets for when a new message is received?
- - Open images in a lightbox
+ - ~~Implement Google Chrome notification API when a new message is received~~
+ - ~~Implement web sockets for when a new message is received?~~
+ - ~~Open images in a lightbox~~
  - ~~Implement full text search~~
  - Implement column sorting (received, subject etc.)
  - ~~Implement CLI entry point (.ie. bin/capto)~~
