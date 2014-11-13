@@ -124,6 +124,14 @@ Ext.define('MailViewer.MessageGrid', {
                     url: '/messages',
                     method: 'DELETE',
                     success: function () {
+                      // remove any open tabs
+                      var messageContainer = Ext.getCmp('messagecontainer');
+                      messageContainer.removeAllTabs();
+
+                      // reset message preview panel
+                      var messageContainer = Ext.getCmp('messagedisplay');
+                      messageContainer.update();
+
                       MessageStore.reload();
                     }, failure: function () {
                       Ext.Msg.alert('Error', 'Couldn\'t delete the messages :-(');

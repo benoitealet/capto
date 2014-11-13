@@ -5,7 +5,9 @@ Ext.define('MailViewer.MessageDetail', {
   border: false,
 
   initComponent: function () {
-    this.display = Ext.create('widget.message', {});
+    this.display = Ext.create('widget.message', {
+      id: 'messagedisplay'
+    });
     Ext.apply(this, {
       layout: 'border',
       items: [this.createGrid(), this.createSouth()]

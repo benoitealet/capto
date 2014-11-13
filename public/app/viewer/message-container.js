@@ -1,5 +1,4 @@
 Ext.define('MailViewer.MessageContainer', {
-
   extend: 'Ext.tab.Panel',
   alias: 'widget.messagecontainer',
   id: 'messagecontainer',
@@ -60,10 +59,18 @@ Ext.define('MailViewer.MessageContainer', {
   onRowDblClick: function (info, rec) {
     this.onTabOpen(null, rec);
   },
-  removeTab: function(rec) {
+  removeTab: function (rec) {
     var item = this.getTabById(rec.get('id'));
     if (item) {
       this.remove(item);
     }
+  },
+  removeAllTabs: function () {
+    var _this = this;
+    this.items.each(function (item) {
+      if (item.itemId !== 'messages') {
+        _this.remove(item);
+      }
+    });
   }
 });

@@ -82,14 +82,6 @@ module.exports = function (orm, db) {
           ccs = [];
         }
 
-        if (this.headers) {
-          headers = this.headers.map(function (c) {
-            return c.serialize();
-          });
-        } else {
-          headers = [];
-        }
-
         return {
           id: this.id,
           subject: this.subject,
@@ -98,10 +90,11 @@ module.exports = function (orm, db) {
           received: this.received,
           read: this.read,
           size: this.size,
+          hasHtml: (this.html) ? true : false,
+          hasPlain: (this.plain) ? true : false,
           humanSize: pretty(this.size),
           recipients: recipients,
           ccs: ccs,
-          headers: headers,
           attachments: attachments
         };
       }

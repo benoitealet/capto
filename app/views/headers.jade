@@ -1,0 +1,15 @@
+doctype html
+html
+  head
+    link(rel='stylesheet', type='text/css', href='/stylesheets/style.css')
+  body
+    table.headers
+      thead
+        tr
+          th Name
+          th Value
+      tbody
+        each header in headers
+          tr
+            td= header.name
+            td= header.value

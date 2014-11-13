@@ -1,5 +1,5 @@
 function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
-  var express = require('express'),
+  var express = require('express.io'),
     path = require('path'),
     routes = require('./app/config/routes'),
     logger = require('./app/services/logger'),
@@ -7,9 +7,12 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
     models = require('./app/models/'),
     settings = require('./app/config/settings'),
     request = require('request'),
-    util = require('util');
+    util = require('util'),
+    favicon = require('serve-favicon');
 
   var app = express();
+  app.http().io();
+
   app.use(function (req, res, next) {
     var data = '';
     req.setEncoding('utf8');
@@ -37,18 +40,19 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
       return next();
     });
   });
+
+  app.use(favicon(__dirname + '/public/favicon.ico'));
   app.use(routes);
 
-
-// catch 404 and forward to error handler
+  // catch 404 and forward to error handler
   app.use(function (req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
     next(err);
   });
 
-// development error handler
-// will print stacktrace
+  // development error handler
+  // will print stacktrace
   if (app.get('env') === 'development') {
     app.use(function (err, req, res, next) {
       res.status(err.status || 500);
@@ -78,9 +82,9 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
   });
 
   var smtpServer = smtp.createServer(function (req) {
-    var emailData = '';
 
     req.on('message', function (stream, ack) {
+      var emailData = '';
       ack.accept();
       stream.on('data', function (chunk) {
         emailData += chunk;

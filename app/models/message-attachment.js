@@ -29,7 +29,7 @@ module.exports = function (orm, db) {
     content: {
       type: 'binary',
       big: true,
-      required: true
+      required: false
     }
   }, {
     methods: {

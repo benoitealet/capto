@@ -35,14 +35,6 @@ Ext.define('MailViewer.App', {
       ]
     });
 
-    Ext.define('MailViewer.model.MessageHeader', {
-      extend: 'Ext.data.Model',
-      fields: [
-        { name: 'name', 'type': 'string' },
-        { name: 'value', type: 'string' }
-      ]
-    });
-
     Ext.define('Message', {
       extend: "Ext.data.Model",
       idProperty: 'id',
@@ -54,14 +46,11 @@ Ext.define('MailViewer.App', {
         { name: 'fromAddress', type: 'string' },
         { name: 'read', type: 'boolean' },
         { name: 'size', type: 'int'},
+        { name: 'hasHtml', type: 'boolean' },
+        { name: 'hasPlain', type: 'boolean' },
         { name: 'humanSize', type: 'string' }
       ],
       hasMany: [
-        {
-          name: 'headers',
-          model: 'MailViewer.model.MessageHeader',
-          associationKey: 'headers'
-        },
         {
           name: 'recipients',
           model: 'MailViewer.model.MessageRecipient',
@@ -96,8 +85,5 @@ Ext.define('MailViewer.App', {
     });
 
     return this.messageContainer;
-  },
-  setupApplication: function () {
-    this.remove(this.loginWindow);
   }
 });

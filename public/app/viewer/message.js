@@ -86,20 +86,7 @@ Ext.define('FeedViewer.Message', {
     '<iframe class="message-content" src="/messages/{id}/source" scrolling="yes"></iframe>',
     '</tpl>',
     '<tpl if="viewMode == 4">',
-    '<table class="headers">',
-    '<thead>',
-    '<tr>',
-    '<th>Name</th><th>Value</th>',
-    '</tr>',
-    '</thead>',
-    '<tbody>',
-    '<tpl for="headers">',
-    '<tr>',
-    '<td>{name}</td><td>{value}</td>',
-    '</tr>',
-    '</tpl>',
-    '</tbody>',
-    '</table>',
+    '<iframe class="message-content" src="/messages/{id}/headers?html" scrolling="yes"></iframe>',
     '</tpl>',
     {
       defaultValue: function (v) {
@@ -131,7 +118,11 @@ Ext.define('FeedViewer.Message', {
       formatAttachments: function (attachments, id) {
         var html = '';
         attachments.forEach(function (attachment) {
-          html += Ext.String.format('<a target="_blank" href="/messages/{0}/attachments/{1}">{2}</a>', id, attachment.id, attachment.name);
+          if (/image\/jpeg|image\/png|image\/gif/.test(attachment.contentType)) {
+            html += Ext.String.format('<a class="attachment-image" href="/messages/{0}/attachments/{1}?download">{2}</a>', id, attachment.id, attachment.name);
+          } else {
+            html += Ext.String.format('<a  target="_blank" href="/messages/{0}/attachments/{1}?download">{2}</a>', id, attachment.id, attachment.name);
+          }
         });
         return html;
       }
@@ -142,7 +133,7 @@ Ext.define('FeedViewer.Message', {
   setActive: function (rec) {
     var me = this;
     me.active = rec;
-    rec.data.viewMode = 1;
+    rec.data.viewMode = (rec.data.hasHtml) ? 1 : 2;
     me.update(rec.data);
   }
 });

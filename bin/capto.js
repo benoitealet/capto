@@ -53,9 +53,8 @@ program.command('db:setup')
             if (err) {
               return callback(err);
             }
-
             var version = data[0].version;
-            if (versionCompare(version, '5.6') > 0) {
+            if (versionCompare(version, '5.6') < 0) {
               console.log(util.format('Your MySQL version %s is lower than 5.6. Falling back to MyISAM for full text searching', version));
               db.driver.execQuery('ALTER TABLE message ENGINE = MYISAM;', function (err) {
                 return callback(err);
@@ -64,9 +63,15 @@ program.command('db:setup')
               return callback();
             }
           });
-
         }, function (callback) {
           db.driver.execQuery('ALTER TABLE message ADD FULLTEXT(source);', function (err) {
+            return callback(err);
+          });
+        }, function (callback) {
+          /**
+           * Convert message table to UTF8
+           */
+          db.driver.execQuery('ALTER TABLE message CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;', function (err) {
             return callback(err);
           });
         }
