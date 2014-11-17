@@ -1,6 +1,5 @@
 'use strict';
 var _ = require('lodash'),
-  logger = require('../services/logger'),
   MailParser = require("mailparser").MailParser,
   util = require('util'),
   MessageBuilder = require('../services/message-builder');
@@ -10,7 +9,7 @@ module.exports = {
     var messageService = require('../services/message')(req.db.models);
     var data = req.body;
     var mp = new MailParser({ debug: false, streamAttachments: false });
-    mp.on("end", function (mail) {
+    mp.on('end', function (mail) {
       var builder = new MessageBuilder(mail, data);
       messageService.create(builder, function (err, message) {
         if (err) {
@@ -24,8 +23,8 @@ module.exports = {
     mp.end();
   },
   all: function (req, res) {
-    var limit = /^\d+$/.test(req.query.limit) ? req.query.limit : 50;
-    var offset = /^\d+$/.test(req.query.offset) ? req.query.offset : 0;
+    var limit = /^\d+$/.test(req.query.limit) ? req.query.limit : 50,
+      offset = /^\d+$/.test(req.query.offset) ? req.query.offset : 0;
 
     if (req.query.q) {
       req.models.message.match('source').against(req.query.q)
@@ -188,7 +187,7 @@ module.exports = {
       });
 
       if (html === undefined) {
-        return res.status(200).json(data);
+        return res.status(200).json({ data: data });
       }
       return res.render('headers', { headers: data });
     });
