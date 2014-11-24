@@ -1,34 +1,38 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
+
   <head>
-    <meta charset="utf-8">
+    <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Capto by jamhall</title>
+    <meta name="description" content="Capto : Mail catcher for NodeJs">
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <title>Capto</title>
   </head>
+
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>Capto</h1>
-        <p>Mail catcher for NodeJs</p>
-        <p class="view"><a href="https://github.com/jamhall/capto">View the Project on GitHub <small>jamhall/capto</small></a></p>
-        <ul>
-          <li><a href="https://github.com/jamhall/capto/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/jamhall/capto/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/jamhall/capto">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/jamhall/capto">View on GitHub</a>
+
+          <h1 id="project_title">Capto</h1>
+          <h2 id="project_tagline">Mail catcher for NodeJs</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/jamhall/capto/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/jamhall/capto/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
         <h4>
-<a name="development-email-testing-made-easy" class="anchor" href="#development-email-testing-made-easy"><span class="octicon octicon-link"></span></a>Development email testing made easy</h4>
+<a id="development-email-testing-made-easy" class="anchor" href="#development-email-testing-made-easy" aria-hidden="true"><span class="octicon octicon-link"></span></a>Development email testing made easy</h4>
 
 <p>Capto runs a simple SMTP server that captures any messages sent to it and displays it in a web interface.  No messages are relayed to any email addresses.</p>
 
@@ -41,10 +45,13 @@
 <p><a href="https://nodei.co/npm/capto/"><img src="https://nodei.co/npm/capto.png" alt="NPM"></a></p>
 
 <h4>
-<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h4>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h4>
 
 <ul>
 <li>Catches all mail and stores it for display.</li>
+<li>Display inline images</li>
+<li>Get notified when a new message arrives via websockets and browser desktop notifications</li>
+<li>Display attachment images in lightbox popup</li>
 <li>Displays recipients and CCs</li>
 <li>Display headers</li>
 <li>Keyboard navigation between messages</li>
@@ -60,7 +67,7 @@
 <p>The backend is written in NodeJs using the Express framework and the frontend is driven by ExtJs 5.</p>
 
 <h4>
-<a name="api" class="anchor" href="#api"><span class="octicon octicon-link"></span></a>API</h4>
+<a id="api" class="anchor" href="#api" aria-hidden="true"><span class="octicon octicon-link"></span></a>API</h4>
 
 <p>The backend exposes a RESTful API:</p>
 
@@ -119,38 +126,33 @@
 <td>Get the plain text of a message</td>
 </tr>
 <tr>
-<td>/messages/{id}/attachments</td>
-<td>GET</td>
-<td>List the attachments for a message (does not include content)</td>
-</tr>
-<tr>
 <td>/messages/{id}/attachments/{attachmentId}</td>
 <td>GET</td>
 <td>Get an attachment (to download append ?download to the URL)</td>
 </tr>
+<tr>
+<td>/messages/{id}/headers</td>
+<td>GET</td>
+<td>Get the headers for a message (for a html representation append ?html to the URL)</td>
+</tr>
 </tbody>
 </table>
 
-<p>To post an eml via file via Curl, do the following:</p>
-
-<pre><code>curl --noproxy localhost -X POST -H "Content-Type: text/plain" --data-binary @/path/to/file.eml http://localhost:9024/messages
-</code></pre>
-
 <h4>
-<a name="to-do" class="anchor" href="#to-do"><span class="octicon octicon-link"></span></a>To do</h4>
+<a id="to-do" class="anchor" href="#to-do" aria-hidden="true"><span class="octicon octicon-link"></span></a>To do</h4>
 
 <ul>
 <li>Write tests in Mocha</li>
-<li>Implement Google Chrome notification API when a new message is received</li>
-<li>Implement web sockets for when a new message is received?</li>
-<li>Open images in a lightbox</li>
+<li><del>Implement Google Chrome notification API when a new message is received</del></li>
+<li><del>Implement web sockets for when a new message is received?</del></li>
+<li><del>Open images in a lightbox</del></li>
 <li><del>Implement full text search</del></li>
 <li>Implement column sorting (received, subject etc.)</li>
 <li><del>Implement CLI entry point (.ie. bin/capto)</del></li>
 </ul>
 
 <h4>
-<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h4>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h4>
 
 <blockquote>
 <p>Capto requires a MySQL database. The code project was originally designed to use SQLite, however, due to nodes asynchronous nature,  database writes were failing when multiple requests were sent in quick succession. </p>
@@ -201,58 +203,28 @@
 </code></pre>
 
 <h4>
-<a name="configure-your-project" class="anchor" href="#configure-your-project"><span class="octicon octicon-link"></span></a>Configure your project</h4>
-
-<p>Configure your application to send emails via port 9025 and open <a href="http://localhost:9024">http://localhost:9024</a> in your browser.</p>
-
-<h5>
-<a name="rails" class="anchor" href="#rails"><span class="octicon octicon-link"></span></a>Rails</h5>
-
-<pre><code>config.action_mailer.delivery_method = :smtp
-config.action_mailer.smtp_settings = { :address =&gt; "localhost", :port =&gt; 9025 }
-</code></pre>
-
-<h5>
-<a name="nodemailer" class="anchor" href="#nodemailer"><span class="octicon octicon-link"></span></a>Nodemailer</h5>
-
-<pre><code>var nodemailer = require('nodemailer');
-var smtpTransport = require('nodemailer-smtp-transport');
-var transporter = nodemailer.createTransport(smtpTransport({
-  host: 'localhost',
-  port: 9025,
-  ignoreTLS: true
-}));
-</code></pre>
-
-<h5>
-<a name="django" class="anchor" href="#django"><span class="octicon octicon-link"></span></a>Django</h5>
-
-<pre><code>if DEBUG:
-    EMAIL_HOST = '127.0.0.1'
-    EMAIL_HOST_USER = ''
-    EMAIL_HOST_PASSWORD = ''
-    EMAIL_PORT = 9025
-    EMAIL_USE_TLS = False
-</code></pre>
-
-<h4>
-<a name="thanks" class="anchor" href="#thanks"><span class="octicon octicon-link"></span></a>Thanks</h4>
+<a id="thanks" class="anchor" href="#thanks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Thanks</h4>
 
 <p>Many thanks to <a href="https://github.c/sj26">sj26</a> for his excellent <a href="https://github.com/sj26/mailcatcher">mailcatcher</a> project for the inspiration for this project.</p>
 
 <p>Many thanks also goes to the many developers who have contributed to the various libraries used in this project.</p>
 
 <h4>
-<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h4>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h4>
 
 <p>GPLv3. See LICENSE file in the source.</p>
       </section>
     </div>
-    <footer>
-      <p>Project maintained by <a href="https://github.com/jamhall">jamhall</a></p>
-      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
-    </footer>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Capto maintained by <a href="https://github.com/jamhall">jamhall</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
     
+
   </body>
 </html>
