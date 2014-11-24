@@ -22,6 +22,7 @@
     "chance": "^0.6.1",
     "commander": "^2.3.0",
     "express": "^4.9.8",
+    "express.io": "^1.1.13",
     "jade": "^1.6.0",
     "jsesc": "^0.5.0",
     "lodash": "^2.4.1",

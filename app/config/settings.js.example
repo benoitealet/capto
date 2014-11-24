@@ -1,7 +1,15 @@
 'use strict';
 
 var settings = {
-  database: 'mysql://capto:capto@localhost/capto?debug=false',
+  database: {
+    host: 'localhost',
+    database: 'capto',
+    user: 'capto',
+    password: 'capto',
+    protocol: 'mysql',
+    port: '3306',
+    query: { pool: true }
+  },
   smtp: {
     port: 9025,
     ip: '127.0.0.1',
