@@ -8,8 +8,18 @@ module.exports = {
   create: function (req, res) {
     var messageService = require('../services/message')(req.db.models);
     var data = req.body;
+    if (data.length === 0) {
+      return res.status(400).send('Error: No email body sent');
+    }
     var mp = new MailParser({ debug: false, streamAttachments: false });
     mp.on('end', function (mail) {
+      /**
+       * safe to assume if we don't have a recipient address then the email is invalid.
+       * Unfortunately mailparser does not emit errors :-(
+       */
+      if (mail.to === undefined) {
+        return res.status(400).send('Error: Invalid email sent');
+      }
       var builder = new MessageBuilder(mail, data);
       messageService.create(builder, function (err, message) {
         if (err) {
@@ -19,12 +29,13 @@ module.exports = {
         return res.status(201).send({ data: message.serialize() });
       });
     });
+
     mp.write(data);
     mp.end();
   },
   all: function (req, res) {
     var limit = /^\d+$/.test(req.query.limit) ? req.query.limit : 50,
-      offset = /^\d+$/.test(req.query.offset) ? req.query.offset : 0;
+        offset = /^\d+$/.test(req.query.start) ? req.query.start : 0;
 
     if (req.query.q) {
       req.models.message.match('source').against(req.query.q)

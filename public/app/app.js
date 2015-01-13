@@ -12,13 +12,31 @@ Ext.require([
   'Ext.layout.container.Card',
   'Ext.layout.container.Border'
 ]);
+
 Ext.onReady(function () {
-
-
   Ext.tip.QuickTipManager.init();
-  var app = new MailViewer.App();
   /**
-   * Poll the server every 5000 seconds for unread message count
+   * Enable the state manager
+   */
+  Ext.state.Manager.setProvider(
+    new Ext.state.CookieProvider({ expires: new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 730))  })); // expires in two years
+  // setup default settings
+  var stateManager = Ext.state.Manager;
+  if (stateManager.get('enableNotifications') === undefined) {
+    stateManager.set('enableNotifications', true);
+  }
+  if (stateManager.get('enableChromeNotifications') === undefined) {
+    stateManager.set('enableChromeNotifications', true);
+  }
+  if (stateManager.get('messagesPerPage') === undefined) {
+    stateManager.set('messagesPerPage', 50);
+  }
+
+  var app = new MailViewer.App();
+
+
+  /**
+   * Poll the server every 5 seconds for unread message count
    * @type {Ext.direct.PollingProvider}
    */
   var poll = new Ext.direct.PollingProvider({
@@ -59,21 +77,32 @@ Ext.onReady(function () {
   var socketIo = io.connect();
   socketIo.on('new message', function (data) {
     var html = Ext.String.format('<p>{0}</p><b>{1}</b>', data.subject, data.from);
-    if ("Notification" in window) {
-      if (Notification.permission !== 'denied') {
-        var notification = new Notification('New message received', {
-          icon: '/favicon.ico',
-          body: data.subject
-        });
+    if (stateManager.get('enableChromeNotifications') === true) {
+      if ('Notification' in window) {
+        if (Notification.permission !== 'denied') {
+          var notification = new Notification('New message received', {
+            icon: '/favicon.ico',
+            body: data.subject
+          });
+        }
       }
     }
 
-    Ext.toast({
-      html: html,
-      title: 'New message received',
-      width: 400,
-      align: 't'
-    });
+    /**
+     * if the grids current page is 1, then refresh the messages
+     */
+    var messageStore = Ext.StoreMgr.lookup("messageStore");
+    if (messageStore.currentPage === 1) {
+      messageStore.reload();
+    }
+    if (stateManager.get('enableNotifications') === true) {
+      Ext.toast({
+        html: html,
+        title: 'New message received',
+        width: 400,
+        align: 't'
+      });
+    }
   });
 
   /**

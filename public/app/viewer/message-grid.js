@@ -3,12 +3,11 @@ Ext.define('MailViewer.MessageGrid', {
   alias: 'widget.messagegrid',
 
   initComponent: function () {
-
-
     var MessageStore = Ext.create('Ext.data.Store', {
+      id: 'messagestore',
       storeId: 'messageStore',
-      model: "Message",
-      pageSize: 50, // items per page
+      model: 'Message',
+      pageSize: parseInt(Ext.state.Manager.get('messagesPerPage')),
       proxy: {
         type: "ajax",
         appendId: true,
@@ -21,7 +20,7 @@ Ext.define('MailViewer.MessageGrid', {
       },
       params: {
         start: 0,
-        limit: 50
+        limit: parseInt(Ext.state.Manager.get('messagesPerPage'))
       },
       remoteFilter: true,
       autoLoad: true,
@@ -55,6 +54,8 @@ Ext.define('MailViewer.MessageGrid', {
       performQuery: function (query) {
         var store = MessageStore;
         if (query) {
+          // always start at zero when performing a query
+          store.proxy.extraParams.start = 0;
           store.proxy.extraParams.q = query;
           store.reload();
         } else {
@@ -73,6 +74,7 @@ Ext.define('MailViewer.MessageGrid', {
 
     Ext.apply(this, {
       store: MessageStore,
+      id: 'messagegrid',
       viewConfig: {
         autoScroll: true,
         trackOver: false,
@@ -107,6 +109,79 @@ Ext.define('MailViewer.MessageGrid', {
         },
         {
           xtype: 'tbfill'
+        },
+        {
+          xtype: 'button',
+          text: 'Settings',
+          icon: '/images/cog.png',
+          handler: function () {
+            Ext.create('Ext.window.Window', {
+              title: 'Settings',
+              width: 600,
+              layout: 'fit',
+              modal: true,
+              items: [
+                {
+                  xtype: 'form',
+                  border: false,
+                  bodyPadding: 5,
+                  buttons: [
+                    {
+                      text: 'Save settings',
+                      handler: function (button) {
+                        var stateManager = Ext.state.Manager;
+                        var form = this.up('form').getForm();
+                        var values = form.getValues();
+                        stateManager.set('enableChromeNotifications', values.enableChromeNotifications);
+                        stateManager.set('enableNotifications', values.enableNotifications);
+                        stateManager.set('messagesPerPage', values.messagesPerPage);
+                        var messageStore = Ext.getStore("messageStore");
+                        messageStore.reload({ start: 0, limit: stateManager.get('messagesPerPage') });
+                        Ext.apply(messageStore, {pageSize: stateManager.get('messagesPerPage')});
+                        button.up('.window').close();
+                      }
+                    }
+                  ],
+                  listeners: {
+                    afterrender: function (form) {
+                      var stateManager = Ext.state.Manager;
+                      form.add({
+                        xtype: 'checkbox',
+                        labelWidth: 150,
+                        fieldLabel: 'Chrome notifications',
+                        boxLabel: 'Enable chrome notifications when a new message is received',
+                        checked: stateManager.get('enableChromeNotifications'),
+                        uncheckedValue: false,
+                        inputValue: true,
+                        name: 'enableChromeNotifications'
+                      });
+                      form.add({
+                        xtype: 'checkbox',
+                        labelWidth: 150,
+                        fieldLabel: 'Application notifications',
+                        boxLabel: 'Enable application notifications when a new message is received',
+                        checked: stateManager.get('enableNotifications'),
+                        uncheckedValue: false,
+                        inputValue: true,
+                        name: 'enableNotifications'
+                      });
+                      form.add({
+                        xtype: 'combo',
+                        labelWidth: 150,
+                        fieldLabel: 'Messages per page',
+                        name: 'messagesPerPage',
+                        queryMode: 'local',
+                        store: [25, 50, 75, 100, 125, 150, 175, 200],
+                        value: stateManager.get('messagesPerPage'),
+                        autoSelect: true,
+                        forceSelection: true
+                      });
+                    }
+                  }
+                }
+              ]
+            }).show();
+          }
         },
         {
           xtype: 'button',
@@ -324,16 +399,14 @@ Ext.define('MailViewer.MessageGrid', {
    */
   onLoad: function (store, records, success) {
     return;
-    /*if (this.getStore().getCount()) {
-     //this.getSelectionModel().select(0);
-     }*/
   },
 
   formatTitle: function (value, p, record) {
     if (record.data.read) {
       return value;
     }
-    return Ext.String.format('<b>{0}</b>', value);
+    // ExtJs overwrites font-weight for strong or bold...
+    return Ext.String.format('<strong style="font-weight: bold">{0}</strong>', value);
   },
 
   formatRecipients: function (value, p, record) {

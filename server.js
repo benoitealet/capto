@@ -1,14 +1,14 @@
 function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
   var express = require('express.io'),
-    path = require('path'),
-    routes = require('./app/config/routes'),
-    logger = require('./app/services/logger'),
-    smtp = require('smtp-protocol'),
-    models = require('./app/models/'),
-    settings = require('./app/config/settings'),
-    request = require('request'),
-    util = require('util'),
-    favicon = require('serve-favicon');
+      path = require('path'),
+      routes = require('./app/config/routes'),
+      logger = require('./app/services/logger'),
+      smtp = require('smtp-protocol'),
+      models = require('./app/models/'),
+      settings = require('./app/config/settings'),
+      request = require('request'),
+      util = require('util'),
+      favicon = require('serve-favicon');
 
   var app = express();
   app.http().io();
@@ -77,12 +77,11 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
 
   app.set('port', process.env.PORT || 9024);
 
-  var server = app.listen(httpPort, smtpIp, function () {
+  var server = app.listen(httpPort, httpIp, function () {
     logger.http.info('Express server listening on port %d and address %s', server.address().port, server.address().address);
   });
 
   var smtpServer = smtp.createServer(function (req) {
-
     req.on('message', function (stream, ack) {
       var emailData = '';
       ack.accept();
@@ -93,12 +92,16 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
       stream.on('end', function () {
         logger.smtp.info('Received message from: %s (%d)', req.from, emailData.length);
         if (emailData.length > maxMessageSize) {
-          logger.smtp.error('Rejected message from: %s (%d) because it exceeds the maximum size of %d', req.from, emailData.length, 200000);
+          logger.smtp.error('Rejected message from: %s (%d) because it exceeds the maximum size of %d', req.from, emailData.length, maxMessageSize);
           return;
         }
         request.post({
           url: util.format('http://%s:%d/messages', httpIp, httpPort),
           body: emailData
+        }, function optionalCallback(err, httpResponse, body) {
+          if (err || httpResponse.statusCode !== 201) {
+            logger.http.error('Error posting message from: %s to HTTP server', req.from);
+          }
         });
       });
     });
