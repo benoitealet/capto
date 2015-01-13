@@ -15,7 +15,8 @@
     "e-mail",
     "development",
     "testing",
-    "catcher"
+    "catcher",
+    "mailcatcher"
   ],
   "dependencies": {
     "async": "^0.9.0",
@@ -49,6 +50,7 @@
     "type": "git",
     "url": "git@github.com:jamhall/capto.git"
   },
+  "homepage": "https://jamhall.github.io/capto/",
   "author": "Jamie Hall <hall@ill.eu>",
   "license": "GPLv3"
 }
