@@ -6,10 +6,10 @@ function MessageBuilder(mail, source, done) {
   return {
     getMessage: function () {
       var message = {};
-      if (mail.from[0].name !== '') {
-        message.fromName = mail.from[0].name;
-      }
-      message.fromAddress = mail.from[0].address;
+      message.from = {
+        name: mail.from[0].name || null,
+        address: mail.from[0].address
+      };
       message.subject = mail.subject;
 
       if (mail.html !== '') {
@@ -20,7 +20,6 @@ function MessageBuilder(mail, source, done) {
       }
       message.source = source;
       message.size = source.length;
-
       return message;
     },
     getAttachments: function () {

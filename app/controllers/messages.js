@@ -6,16 +6,13 @@ var _ = require('lodash'),
 
 module.exports = {
   create: function (req, res) {
-    var messageService = require('../services/message')(req.db.models);
+    var messageService = require('../services/message')(req.models);
     var data = req.body;
     if (data.length === 0) {
       return res.status(400).send('Error: No email body sent');
     }
-    console.time('CreateMessage');
     var mp = new MailParser({ debug: false, streamAttachments: false });
     mp.on('end', function (mail) {
-      console.timeEnd('CreateMessage');
-
       /**
        * safe to assume if we don't have a recipient address then the email is invalid.
        * Unfortunately mailparser does not emit errors :-(
@@ -24,14 +21,12 @@ module.exports = {
         return res.status(400).send('Error: Invalid email sent');
       }
       var builder = new MessageBuilder(mail, data);
-      console.time('persistMessage');
       messageService.create(builder, function (err, message) {
-        console.timeEnd('persistMessage', message);
         if (err) {
           return res.status(500).send(err);
         }
         req.io.broadcast('new message', { subject: message.subject, from: message.fromAddress });
-        return res.status(201).send({ data: message.serialize() });
+        return res.status(201).send({ data: message });
       });
     });
 
@@ -76,7 +71,7 @@ module.exports = {
     }
   },
   allUnread: function (req, res) {
-    req.models.message.find({ read: false }).count(function (err, count) {
+    req.models.message.count({ read: false }, function (err, count) {
       if (err) {
         return res.status(500).json(err);
       }
@@ -85,8 +80,8 @@ module.exports = {
   },
   get: function (req, res) {
     var id = req.params.id;
-    req.models.message.get(id, function (err, message) {
-      if (err) {
+    req.models.message.findById(id, function (err, message) {
+      if (err || !message) {
         return res.status(404).json('Message not found');
       }
       return res.status(200).json(message);
@@ -94,8 +89,8 @@ module.exports = {
   },
   getSource: function (req, res) {
     var id = req.params.id;
-    req.models.message.get(id, function (err, message) {
-      if (err) {
+    req.models.message.findById(id, function (err, message) {
+      if (err || !message) {
         return res.status(404).send('Message not found');
       }
       res.setHeader('Content-Type', 'text/plain;charset=utf-8');
@@ -104,8 +99,8 @@ module.exports = {
   },
   getPlain: function (req, res) {
     var id = req.params.id;
-    req.models.message.get(id, function (err, message) {
-      if (err) {
+    req.models.message.findById(id, function (err, message) {
+      if (err || !message) {
         return res.status(404).send('Message not found');
       }
       res.setHeader('Content-Type', 'text/plain;charset=utf-8');
@@ -114,7 +109,10 @@ module.exports = {
   },
   getHtml: function (req, res) {
     var id = req.params.id;
-    req.models.message.get(id, function (err, message) {
+    req.models.message.findById(id, function (err, message) {
+      if (err || !message) {
+        return res.status(404).send('Message not found');
+      }
       var html = null;
       if (message.html !== null) {
         html = message.html;
@@ -122,17 +120,14 @@ module.exports = {
           html = html.replace("cid:" + attachment.contentId,
             util.format('/messages/%d/attachments/%d?download', message.id, attachment.id));
         });
-        if (err) {
-          return res.status(404).send('Message not found');
-        }
       }
       return res.status(200).send(html);
     });
   },
   downloadSource: function (req, res) {
     var id = req.params.id;
-    req.models.message.get(id, function (err, message) {
-      if (err) {
+    req.models.message.findById(id, function (err, message) {
+      if (err || !message) {
         return res.status(404).send('Message not found');
       }
       res.setHeader('Content-Type', 'message/rfc822');
@@ -158,11 +153,12 @@ module.exports = {
   },
   update: function (req, res) {
     var id = req.params.id;
-    req.models.message.get(id, function (err, message) {
-      if (err) {
+    req.models.message.findById(id, function (err, message) {
+      if (err || !message) {
         return res.status(404).json('Message not found');
       }
-      message.save({ read: true}, function (err, message) {
+      message.read = true;
+      message.save(function (err, message) {
         return res.status(200).json({
           data: message
         });
@@ -170,7 +166,7 @@ module.exports = {
     });
   },
   deleteAll: function (req, res) {
-    req.models.message.find({}).remove(function (err) {
+    req.models.message.remove({}, function (err) {
       if (err) {
         return res.status(500).json(err);
       }
@@ -179,8 +175,8 @@ module.exports = {
   },
   delete: function (req, res) {
     var id = req.params.id;
-    req.models.message.get(id, function (err, message) {
-      if (err) {
+    req.models.message.findByIdAndRemove(id, function (err, message) {
+      if (err || !message) {
         return res.status(404).json('Message not found');
       }
       message.remove(function (err) {
@@ -194,18 +190,14 @@ module.exports = {
   getHeaders: function (req, res) {
     var id = req.params.id,
         html = req.query.html;
-    req.models.message_header.find({ message_id: id}, function (err, headers) {
-      if (err) {
+    req.models.message.findById(id, function (err, message) {
+      if (err || !message) {
         return res.status(404).send('Message not found');
       }
-      var data = headers.map(function (header) {
-        return header.serialize();
-      });
-
       if (html === undefined) {
-        return res.status(200).json({ data: data });
+        return res.status(200).json({ data: message.headers });
       }
-      return res.render('headers', { headers: data });
+      return res.render('headers', { headers: message.headers });
     });
   },
 };

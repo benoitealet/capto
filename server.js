@@ -8,7 +8,8 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
       settings = require('./app/config/settings'),
       request = require('request'),
       util = require('util'),
-      favicon = require('serve-favicon');
+      favicon = require('serve-favicon'),
+      mongoose = require('mongoose');
 
   var app = express();
   app.http().io();
@@ -26,19 +27,31 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
     });
   });
 
+  /** Setup mongoose **/
+
+  mongoose.set('debug', settings.database.debug);
+
+// Connect to mongodb
+  var connect = function () {
+    mongoose.connect(settings.database.url, settings.database.options);
+  };
+  connect();
+
+  mongoose.connection.on('error', logger.http.error);
+  mongoose.connection.on('disconnected', connect);
+
+
   // view engine setup
   app.set('views', path.join(__dirname, '/app/views'));
   app.set('view engine', 'jade');
   app.use(express.static(path.join(__dirname, 'public')));
+
+
   app.use(function (req, res, next) {
-    models(settings, function (err, db) {
-      if (err) return next(err);
-
-      req.models = db.models;
-      req.db = db;
-
-      return next();
-    });
+    req.models = {
+      message: mongoose.model('message', require(path.join(__dirname, '/app/mongoose/message')))
+    };
+    next();
   });
 
   app.use(favicon(__dirname + '/public/favicon.ico'));
@@ -88,6 +101,8 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
         .on('response', function (response) {
           if (response.statusCode !== 201) {
             logger.http.error('Error persisting message to database from: %s', req.from);
+          } else {
+            logger.http.info('Persisted messages to database from: %s', req.from);
           }
         })
         .on('error', function () {
