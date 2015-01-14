@@ -73,5 +73,8 @@ var messageSchema = new Schema({
 messageSchema.virtual('humanSize').get(function () {
   return pretty(this.size)
 });
+messageSchema.virtual('hasHtml').get(function () {
+  return this.html ? true : false;
+});
 
 module.exports = messageSchema;

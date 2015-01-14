@@ -4,7 +4,6 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
       routes = require('./app/config/routes'),
       logger = require('./app/services/logger'),
       smtp = require('smtp-protocol'),
-      models = require('./app/models/'),
       settings = require('./app/config/settings'),
       request = require('request'),
       util = require('util'),
