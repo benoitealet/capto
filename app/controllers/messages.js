@@ -38,19 +38,14 @@ module.exports = {
         offset = /^\d+$/.test(req.query.start) ? req.query.start : 0;
 
     if (req.query.q) {
-      req.models.message.match('source').against(req.query.q)
-        .limit(parseInt(limit)).offset(parseInt(offset))
-        .run(function (err, messages) {
-          if (err) {
-            return res.json(err);
-          }
-          req.models.message.match('source').against(req.query.q).run(function (err, count) {
-            var data = messages.map(function (message) {
-              return message.serialize();
-            });
-            return res.json({ data: data, totalCount: count.length });
-          });
-        });
+      req.models.message.textSearch(req.query.q, function (err, output) {
+        if (err) {
+          console.error(err);
+          return res.status(400).send('Error');
+        }
+        return res.json({ data: output  });
+
+      });
     } else {
       req.models.message.find({}, 'subject from received read size recipients ccs html plain ' +
         'attachments.name attachments.contentType attachments._id ' +

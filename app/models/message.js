@@ -1,7 +1,7 @@
 'use strict';
 var mongoose = require('mongoose');
+var textSearch = require('mongoose-text-search');
 var Schema = mongoose.Schema;
-var mongooseFS = require('mongoose-fs');
 var _ = require('lodash');
 var pretty = require('prettysize');
 
@@ -76,5 +76,8 @@ messageSchema.virtual('humanSize').get(function () {
 messageSchema.virtual('hasHtml').get(function () {
   return this.html ? true : false;
 });
+
+messageSchema.plugin(textSearch);
+
 
 module.exports = messageSchema;
