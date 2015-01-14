@@ -18,6 +18,7 @@ module.exports = function (models) {
       });
 
       _.forEach(builder.getAttachments(), function (attachment) {
+        console.log('Attachment length', attachment.content.length);
         message.attachments.push(attachment);
       });
 

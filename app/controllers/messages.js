@@ -52,7 +52,9 @@ module.exports = {
           });
         });
     } else {
-      req.models.message.find({}, 'subject from received read size recipients ccs html plain attachments').sort('-received').skip(offset).limit(limit).exec(function (err, messages) {
+      req.models.message.find({}, 'subject from received read size recipients ccs html plain ' +
+        'attachments.name attachments.contentType attachments._id ' +
+        'attachments.size attachments.contentId').sort('-received').skip(offset).limit(limit).exec(function (err, messages) {
         if (err || !messages) {
           console.error('Error fetching messages', err);
           return res.status(400).json(err);
@@ -130,16 +132,22 @@ module.exports = {
     var id = req.params.id,
         attachmentId = req.params.attachmentId,
         download = req.query.download;
-    req.models.message_attachment.find({ 'id': attachmentId, 'message_id': id }).first(function (err, attachment) {
-      if (err || !attachment) {
+    req.models.message.findById(id, function (err, message) {
+      if (err || !message) {
+        return res.status(404).send('Message not found');
+      }
+      var attachment = message.attachments.id(attachmentId);
+      if (!attachment) {
         return res.status(404).send('Attachment not found');
       }
       if (download === undefined) {
-        return res.status(200).json({ data: attachment.serialize() });
+        return res.status(200).json({ data: attachment });
       }
+
       res.setHeader('Content-Type', attachment.contentType);
       res.setHeader('Content-disposition', 'attachment; filename=' + attachment.name);
       return res.status(200).send(attachment.content);
+
     });
   },
   update: function (req, res) {

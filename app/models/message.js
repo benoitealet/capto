@@ -9,11 +9,11 @@ var attachmentSchema = mongoose.Schema({
   checksum: String,
   name: String,
   size: Number,
+  content: Buffer,
   contentId: String,
   contentType: String
 });
 
-attachmentSchema.plugin(mongooseFS, {keys: ['content'], mongoose: mongoose});
 
 var messageSchema = new Schema({
   subject: {
