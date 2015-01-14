@@ -228,7 +228,7 @@ Ext.define('MailViewer.MessageGrid', {
         },
         {
           text: 'From',
-          dataIndex: 'fromAddress',
+          dataIndex: 'from',
           renderer: this.formatFrom,
           sortable: false,
           hidden: false,
@@ -335,6 +335,7 @@ Ext.define('MailViewer.MessageGrid', {
    * @param {Object} index The row index
    */
   onRowClick: function (view, record, item, index, e) {
+    console.log(record);
     this.setRead(record);
     //this.fireEvent('rowclick', this, this.store.getAt(index));
   },
@@ -363,7 +364,7 @@ Ext.define('MailViewer.MessageGrid', {
     if (record !== undefined) {
       if (record.get('read') === false) {
         Ext.Ajax.request({
-          url: '/messages/' + record.get('id'),
+          url: '/messages/' + record.get('_id'),
           method: 'PUT',
           success: function (response) {
             record.set('read', true);
@@ -432,10 +433,10 @@ Ext.define('MailViewer.MessageGrid', {
     return Ext.Date.format(date, 'Y/m/d g:i a');
   },
   formatFrom: function (value, p, record) {
-    if (record.data.fromName) {
-      return Ext.String.format('{0} &lt;{1}&gt;', record.data.fromName, value);
+    if (value.name) {
+      return Ext.String.format('{0} &lt;{1}&gt;', value.name, value.address);
     }
-    return value;
+    return value.from.address;
   }
 })
 ;

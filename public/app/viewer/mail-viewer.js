@@ -9,10 +9,12 @@ Ext.define('MailViewer.App', {
 
     Ext.define('MessageRecipient', {
       extend: 'Ext.data.Model',
+      idProperty: '_id',
       fields: [
         'name',
         'address'
-      ]
+      ],
+      belongsTo: 'Message'
     });
 
     Ext.define('MessageCC', {
@@ -25,6 +27,7 @@ Ext.define('MailViewer.App', {
 
     Ext.define('MailViewer.model.MessageAttachment', {
       extend: 'Ext.data.Model',
+      idProperty: '_id',
       fields: [
         { name: 'id', type: 'int' },
         { name: 'name', 'type': 'string' },
@@ -37,36 +40,20 @@ Ext.define('MailViewer.App', {
 
     Ext.define('Message', {
       extend: "Ext.data.Model",
-      idProperty: 'id',
+      idProperty: '_id',
       fields: [
-        { name: 'id', type: 'int' },
         { name: 'subject', type: 'string' },
         { name: 'received', type: 'date' },
-        { name: 'fromName', type: 'string' },
-        { name: 'fromAddress', type: 'string' },
-        { name: 'read', type: 'boolean' },
+        { name: 'from', type: 'auto' },
         { name: 'size', type: 'int'},
         { name: 'hasHtml', type: 'boolean' },
         { name: 'hasPlain', type: 'boolean' },
         { name: 'humanSize', type: 'string' }
       ],
-      hasMany: [
-        {
-          name: 'recipients',
-          model: 'MailViewer.model.MessageRecipient',
-          associationKey: 'recipients'
-        },
-        {
-          name: 'ccs',
-          model: 'MailViewer.model.MessageCC',
-          associationKey: 'ccs'
-        },
-        {
-          name: 'attachments',
-          model: 'MailViewer.model.MessageAttachment',
-          associationKey: 'attachments'
-        }
-      ]
+      hasMany: {
+        model: 'MailViewer.model.MessageRecipient', name: 'recipients'
+      }
+
     });
 
     Ext.apply(this, {

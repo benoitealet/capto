@@ -41,7 +41,8 @@ var messageSchema = new Schema({
   ],
   received: {
     type: Date,
-    defaultValue: new Date
+    index: true,
+    default: Date.now
   },
   html: {
     type: String

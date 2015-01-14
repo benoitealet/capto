@@ -52,22 +52,13 @@ module.exports = {
           });
         });
     } else {
-      req.models.message.find({}).limit(parseInt(limit)).offset(parseInt(offset))
-        .order("-received").only('id', 'subject', 'fromName', 'fromAddress', 'received', 'read', 'size', 'html', 'plain')
-        .run(function (err, messages) {
-          if (err) {
-            return res.json(err);
-          }
-          req.models.message.count({}, function (err, count) {
-            if (err) {
-              return res.status(400).json(err);
-            }
-            var data = messages.map(function (message) {
-              return message.serialize();
-            });
-            return res.json({ data: data, totalCount: count });
-          });
-        });
+      req.models.message.find({}, 'subject from received read size html plain recipients').sort('-received').skip(offset).limit(limit).exec(function (err, messages) {
+        if (err || !messages) {
+          console.error('Error fetching messages', err);
+          return res.status(400).json(err);
+        }
+        return res.json({ data: messages, totalCount: messages.length });
+      });
     }
   },
   allUnread: function (req, res) {
