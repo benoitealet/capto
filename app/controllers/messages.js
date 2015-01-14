@@ -38,12 +38,19 @@ module.exports = {
         offset = /^\d+$/.test(req.query.start) ? req.query.start : 0;
 
     if (req.query.q) {
-      req.models.message.textSearch(req.query.q, function (err, output) {
+      req.models.message.textSearch(req.query.q, { }, function (err, output) {
         if (err) {
           console.error(err);
           return res.status(400).send('Error');
         }
-        return res.json({ data: output  });
+        if (output.results.length === 0) {
+          return res.json({ data: []});
+        }
+
+        return res.json({ data: _.map(output.results, function (result) {
+          return result.obj;
+        })
+        });
 
       });
     } else {

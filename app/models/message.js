@@ -25,7 +25,9 @@ var messageSchema = new Schema({
   },
   recipients: [
     {
-      name: String,
+      name: {
+        type: String
+      },
       address: String
     }
   ],
@@ -79,5 +81,6 @@ messageSchema.virtual('hasHtml').get(function () {
 
 messageSchema.plugin(textSearch);
 
+messageSchema.index({ source: 'text' });
 
 module.exports = messageSchema;
