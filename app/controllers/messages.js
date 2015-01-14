@@ -1,8 +1,8 @@
 'use strict';
 var _ = require('lodash'),
-  MailParser = require("mailparser").MailParser,
-  util = require('util'),
-  MessageBuilder = require('../services/message-builder');
+    MailParser = require("mailparser").MailParser,
+    util = require('util'),
+    MessageBuilder = require('../services/message-builder');
 
 module.exports = {
   create: function (req, res) {
@@ -11,8 +11,11 @@ module.exports = {
     if (data.length === 0) {
       return res.status(400).send('Error: No email body sent');
     }
+    console.time('CreateMessage');
     var mp = new MailParser({ debug: false, streamAttachments: false });
     mp.on('end', function (mail) {
+      console.timeEnd('CreateMessage');
+
       /**
        * safe to assume if we don't have a recipient address then the email is invalid.
        * Unfortunately mailparser does not emit errors :-(
@@ -21,7 +24,9 @@ module.exports = {
         return res.status(400).send('Error: Invalid email sent');
       }
       var builder = new MessageBuilder(mail, data);
+      console.time('persistMessage');
       messageService.create(builder, function (err, message) {
+        console.timeEnd('persistMessage', message);
         if (err) {
           return res.status(500).send(err);
         }
@@ -137,8 +142,8 @@ module.exports = {
   },
   getAttachment: function (req, res) {
     var id = req.params.id,
-      attachmentId = req.params.attachmentId,
-      download = req.query.download;
+        attachmentId = req.params.attachmentId,
+        download = req.query.download;
     req.models.message_attachment.find({ 'id': attachmentId, 'message_id': id }).first(function (err, attachment) {
       if (err || !attachment) {
         return res.status(404).send('Attachment not found');
@@ -188,7 +193,7 @@ module.exports = {
   },
   getHeaders: function (req, res) {
     var id = req.params.id,
-      html = req.query.html;
+        html = req.query.html;
     req.models.message_header.find({ message_id: id}, function (err, headers) {
       if (err) {
         return res.status(404).send('Message not found');

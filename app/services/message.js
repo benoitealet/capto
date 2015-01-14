@@ -1,37 +1,44 @@
 module.exports = function (models) {
   var logger = require('./logger').http,
-    async = require('async');
+      async = require('async'),
+      _ = require('lodash');
 
   var createAttachments = function (message, attachments, done) {
     if (attachments === null) {
       return done(null, message);
     }
-    models.message_attachment.create(attachments, function (err, attachments) {
+    async.forEach(attachments, function (attachment, callback) {
+      attachment.message_id = message.id;
+      models.message_attachment.create(attachment, function (err) {
+        if (err) {
+          return callback(err);
+        }
+        return callback(null);
+      });
+    }, function (err) {
       if (err) {
+        logger.error('Error creating attachments', err);
         return done(err);
       }
-      message.setAttachments(attachments, function (err) {
-        if (err) {
-          return done(err);
-        }
-        return done(null);
-      });
+      return done(null);
     });
   };
 
   var createRecipients = function (message, recipients, done) {
-    models.message_recipient.create(recipients, function (err, recipients) {
+    async.forEach(recipients, function (recipient, callback) {
+      recipient.message_id = message.id;
+      models.message_recipient.create(recipient, function (err) {
+        if (err) {
+          return callback(err);
+        }
+        return callback(null);
+      });
+    }, function (err) {
       if (err) {
         logger.error('Error creating recipients', err);
         return done(err);
       }
-      message.setRecipients(recipients, function (err) {
-        if (err) {
-          logger.error('Error settings recipients', err);
-          return done(err);
-        }
-        return done(null);
-      });
+      return done(null);
     });
   };
 
@@ -39,34 +46,38 @@ module.exports = function (models) {
     if (ccs === null) {
       return done(null);
     }
-    models.message_cc.create(ccs, function (err, ccs) {
+    async.forEach(ccs, function (cc, callback) {
+      cc.message_id = message.id;
+      models.message_cc.create(cc, function (err) {
+        if (err) {
+          return callback(err);
+        }
+        return callback(null);
+      });
+    }, function (err) {
       if (err) {
         logger.error('Error creating CCs', err);
         return done(err);
       }
-      message.setCcs(ccs, function (err) {
-        if (err) {
-          logger.error('Error settings CCs', err);
-          return done(err);
-        }
-        return done(null);
-      });
+      return done(null);
     });
   };
 
   var createHeaders = function (message, headers, done) {
-    models.message_header.create(headers, function (err, headers) {
+    async.forEach(headers, function (header, callback) {
+      header.message_id = message.id;
+      models.message_header.create(header, function (err) {
+        if (err) {
+          return callback(err);
+        }
+        return callback(null);
+      });
+    }, function (err) {
       if (err) {
-        logger.error('Error crsssseating headers', err);
+        logger.error('Error creating headers', err);
         return done(err);
       }
-      message.setHeaders(headers, function (err) {
-        if (err) {
-          logger.error('Error settings headers', err);
-          return done(err);
-        }
-        return done(null);
-      });
+      return done(null);
     });
   };
 
@@ -77,7 +88,7 @@ module.exports = function (models) {
           logger.error('Create message error', err);
           return done(err);
         }
-        async.series([
+        async.parallel([
           function (callback) {
             createHeaders(message, builder.getHeaders(), function (err) {
               callback(err);

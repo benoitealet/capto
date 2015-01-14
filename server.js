@@ -26,7 +26,7 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
     });
   });
 
-// view engine setup
+  // view engine setup
   app.set('views', path.join(__dirname, '/app/views'));
   app.set('view engine', 'jade');
   app.use(express.static(path.join(__dirname, 'public')));
@@ -83,27 +83,17 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
 
   var smtpServer = smtp.createServer(function (req) {
     req.on('message', function (stream, ack) {
-      var emailData = '';
-      ack.accept();
-      stream.on('data', function (chunk) {
-        emailData += chunk;
-      });
-
-      stream.on('end', function () {
-        logger.smtp.info('Received message from: %s (%d)', req.from, emailData.length);
-        if (emailData.length > maxMessageSize) {
-          logger.smtp.error('Rejected message from: %s (%d) because it exceeds the maximum size of %d', req.from, emailData.length, maxMessageSize);
-          return;
-        }
-        request.post({
-          url: util.format('http://%s:%d/messages', httpIp, httpPort),
-          body: emailData
-        }, function optionalCallback(err, httpResponse, body) {
-          if (err || httpResponse.statusCode !== 201) {
-            logger.http.error('Error posting message from: %s to HTTP server', req.from);
+      logger.smtp.info('Received message from: %s', req.from);
+      stream.pipe(request.post(util.format('http://%s:%d/messages', httpIp, httpPort))
+        .on('response', function (response) {
+          if (response.statusCode !== 201) {
+            logger.http.error('Error persisting message to database from: %s', req.from);
           }
-        });
-      });
+        })
+        .on('error', function () {
+          logger.http.error('Error creating message from: %s with error', req.from);
+        }), { end: true });
+      ack.accept();
     });
   });
 
