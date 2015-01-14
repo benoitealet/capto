@@ -12,11 +12,11 @@ Ext.define('FeedViewer.Message', {
        * so I've put this ugly code here to solve this issue.
        */
       var id = Ext.get(panel.id),
-        body = id.select('.x-panel-body').first();
+      body = id.select('.x-panel-body').first();
 
       window.setInterval(function () {
         var messageDetails = id.select('.message-details').first(),
-          htmlBody = id.select('.message-content').first();
+            htmlBody = id.select('.message-content').first();
         if (htmlBody) {
           htmlBody.setHeight(body.getHeight() - messageDetails.getHeight());
         }
@@ -72,21 +72,21 @@ Ext.define('FeedViewer.Message', {
     '<li id="headers">Headers</li>',
     '</tpl>',
     '<li class="actions">',
-    '<a class="download-button" href="/messages/{id}/source.eml" id="download-message"><i class="fa fa-download"></i> Download message</a>',
+    '<a class="download-button" href="/messages/{_id}/source.eml" id="download-message"><i class="fa fa-download"></i> Download message</a>',
     '</li>',
     '</ul>',
     '</div>',
     '<tpl if="viewMode == 1">',
-    '<iframe class="message-content" src="/messages/{id}/html" scrolling="yes"></iframe>',
+    '<iframe class="message-content" src="/messages/{_id}/html" scrolling="yes"></iframe>',
     '</tpl>',
     '<tpl if="viewMode == 2">',
-    '<iframe class="message-content" src="/messages/{id}/plain" scrolling="yes"></iframe>',
+    '<iframe class="message-content" src="/messages/{_id}/plain" scrolling="yes"></iframe>',
     '</tpl>',
     '<tpl if="viewMode == 3">',
-    '<iframe class="message-content" src="/messages/{id}/source" scrolling="yes"></iframe>',
+    '<iframe class="message-content" src="/messages/{_id}/source" scrolling="yes"></iframe>',
     '</tpl>',
     '<tpl if="viewMode == 4">',
-    '<iframe class="message-content" src="/messages/{id}/headers?html" scrolling="yes"></iframe>',
+    '<iframe class="message-content" src="/messages/{_id}/headers?html" scrolling="yes"></iframe>',
     '</tpl>',
     {
       defaultValue: function (v) {

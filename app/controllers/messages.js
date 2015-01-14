@@ -52,7 +52,7 @@ module.exports = {
           });
         });
     } else {
-      req.models.message.find({}, 'subject from received read size html plain recipients').sort('-received').skip(offset).limit(limit).exec(function (err, messages) {
+      req.models.message.find({}, 'subject from received read size html plain recipients ccs').sort('-received').skip(offset).limit(limit).exec(function (err, messages) {
         if (err || !messages) {
           console.error('Error fetching messages', err);
           return res.status(400).json(err);

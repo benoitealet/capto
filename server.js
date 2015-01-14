@@ -49,7 +49,7 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
 
   app.use(function (req, res, next) {
     req.models = {
-      message: mongoose.model('message', require(path.join(__dirname, '/app/mongoose/message')))
+      message: mongoose.model('message', require(path.join(__dirname, '/app/models/message')))
     };
     next();
   });

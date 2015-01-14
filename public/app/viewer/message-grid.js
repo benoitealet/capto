@@ -335,9 +335,7 @@ Ext.define('MailViewer.MessageGrid', {
    * @param {Object} index The row index
    */
   onRowClick: function (view, record, item, index, e) {
-    console.log(record);
     this.setRead(record);
-    //this.fireEvent('rowclick', this, this.store.getAt(index));
   },
 
   deleteMessage: function (view, record) {
