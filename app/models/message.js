@@ -1,10 +1,7 @@
 'use strict';
 var mongoose = require('mongoose');
-var textSearch = require('mongoose-text-search');
 var Schema = mongoose.Schema;
 var _ = require('lodash');
-var pretty = require('prettysize');
-
 
 var message = new Schema({
   subject: {
@@ -65,9 +62,6 @@ var message = new Schema({
   toObject: { virtuals: true },
   toJSON: { virtuals: true }
 });
-
-
-message.plugin(textSearch);
 
 message.index({ source: 'text' });
 

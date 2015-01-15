@@ -1,6 +1,6 @@
 var _ = require('lodash'),
-  jsesc = require('jsesc'),
-  mysql = require('mysql');
+  jsesc = require('jsesc');
+
 function MessageBuilder(mail, source, done) {
 
   return {

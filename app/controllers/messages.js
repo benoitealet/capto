@@ -88,7 +88,6 @@ module.exports = {
         return res.status(500).json(err);
       }
       logger.http.info('Fetch %d unread message count', count);
-
       return res.status(200).json({ totalCount: count });
     });
   },
@@ -199,8 +198,8 @@ module.exports = {
       message.read = true;
       message.save(function (err, message) {
         if (err) {
-          logger.http.error('Failed to mark message as read fir message with id: %s', id);
-
+          logger.http.error('Failed to mark message as read for message with id: %s', id);
+          return res.status(500).send('Error updating message');
         }
         logger.http.info('Marked message as read for message with id: %s', id);
         return res.status(200).json({
@@ -256,5 +255,5 @@ module.exports = {
       }
       return res.render('headers', { headers: message.headers });
     });
-  },
+  }
 };

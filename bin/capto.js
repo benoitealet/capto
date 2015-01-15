@@ -7,7 +7,6 @@ var pkg = require('../package.json'),
     settings = require(path.resolve(__dirname, '../app/config/settings')),
     Server = require(path.resolve(__dirname, '../server.js')),
     async = require('async'),
-    versionCompare = require(path.resolve(__dirname, '../app/services/version-compare')),
     util = require('util');
 
 program.version(version, '--version');
