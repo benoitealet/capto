@@ -53,7 +53,6 @@ Ext.define('MailViewer.App', {
       hasMany: {
         model: 'MailViewer.model.MessageRecipient', name: 'recipients'
       }
-
     });
 
     Ext.apply(this, {

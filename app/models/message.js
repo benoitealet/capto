@@ -66,12 +66,6 @@ var message = new Schema({
   toJSON: { virtuals: true }
 });
 
-message.virtual('humanSize').get(function () {
-  return pretty(this.size)
-});
-message.virtual('hasHtml').get(function () {
-  return this.html ? true : false;
-});
 
 message.plugin(textSearch);
 

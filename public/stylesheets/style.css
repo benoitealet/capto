@@ -37,6 +37,8 @@
 
 .preview .x-panel-body div.message-details {
     background: #f1f2f4;
+    margin-top: -3px;
+    padding-top: 5px;
 }
 
 .preview .x-panel-body div.post-body {

@@ -25,10 +25,11 @@ module.exports = {
       var builder = new MessageBuilder(mail, data);
       messageService.create(builder, function (err, message) {
         if (err) {
-          logger.http.error('Error persisting email', err);
+          logger.http.error('Error persisting message from %s to database', message.from.address);
           return res.status(500).send(err);
         }
-        req.io.broadcast('new message', { subject: message.subject, from: message.fromAddress });
+        req.io.broadcast('new message', { subject: message.subject, from: message.from.address});
+        logger.http.info('Persisted message from %s to database', message.from.address);
         return res.status(201).send({ data: message });
       });
     });
@@ -37,36 +38,45 @@ module.exports = {
     mp.end();
   },
   all: function (req, res) {
-    var limit = /^\d+$/.test(req.query.limit) ? req.query.limit : 50,
-        offset = /^\d+$/.test(req.query.start) ? req.query.start : 0,
-        q = req.query.q;
+    var q = req.query.q;
     if (req.query.q) {
-      req.models.message.textSearch(q, { language: req.settings.database.textSearchLanguage }, function (err, output) {
+      req.models.message.find({ $text: { $search: q } })
+        .select('subject from received read size recipients ccs attachments html')
+        .populate('attachments', 'name contentType size contentId').lean()
+        .exec(function (err, messages) {
         if (err) {
           logger.http.error('Error querying messages with query of %s and error %s', q, err);
           return res.status(400).send('Error');
         }
-        if (output.results.length === 0) {
+          if (messages.length === 0) {
           logger.http.info('Fetched no messages matching query %s', q);
           return res.json({ data: []});
         }
-        logger.http.info('Fetched %d messages matching query %s', output.results.length, q);
-        return res.json({ data: _.map(output.results, function (result) {
-          return result.obj;
-        })
+          logger.http.info('Fetched %d messages matching query %s', messages.length, q);
+          return res.status(200).json({ data: _.map(messages, function (message) {
+            if (message.html) {
+              message.hasHtml = true;
+            }
+            delete message.html;
+            return message;
+          }), totalCount: messages.length });
         });
-
-      });
     } else {
-      req.models.message.find({}, 'subject from received read size recipients ccs html plain attachments')
-        .populate('attachments', 'name contentType size contentId').sort('-received').skip(offset).limit(limit).exec(function (err, messages) {
+      req.models.message.find({}, 'subject from received read size recipients ccs attachments html')
+        .populate('attachments', 'name contentType size contentId').lean().sort('-received').exec(function (err, messages) {
           if (err) {
             logger.http.error('Error fetching messages', err);
             return res.status(400).json(err);
           }
           req.models.message.count({}, function (err, count) {
             logger.http.info('Fetched %d messages out of a total of %d', messages.length, count);
-            return res.json({ data: messages, totalCount: count });
+            return res.status(200).json({ data: _.map(messages, function (message) {
+              if (message.html) {
+                message.hasHtml = true;
+              }
+              delete message.html;
+              return message;
+            }), totalCount: count });
           });
         });
     }
@@ -74,19 +84,27 @@ module.exports = {
   allUnread: function (req, res) {
     req.models.message.count({ read: false }, function (err, count) {
       if (err) {
+        logger.http.error('Failed to fetch unread message count', err);
         return res.status(500).json(err);
       }
+      logger.http.info('Fetch %d unread message count', count);
+
       return res.status(200).json({ totalCount: count });
     });
   },
   get: function (req, res) {
     var id = req.params.id;
-    req.models.message.findById(id, function (err, message) {
-      if (err || !message) {
-        return res.status(404).json('Message not found');
-      }
-      return res.status(200).json(message);
-    });
+    req.models.message.findById(id, 'subject from received read size recipients ccs attachments html')
+      .populate('attachments', 'name contentType size contentId').lean().exec(function (err, message) {
+        if (err || !message) {
+          return res.status(404).json('Message not found');
+        }
+        if (message.html) {
+          message.hasHtml = true;
+          delete message.html;
+        }
+        return res.status(200).json(message);
+      });
   },
   getSource: function (req, res) {
     var id = req.params.id;

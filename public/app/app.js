@@ -28,9 +28,6 @@ Ext.onReady(function () {
   if (stateManager.get('enableChromeNotifications') === undefined) {
     stateManager.set('enableChromeNotifications', true);
   }
-  if (stateManager.get('messagesPerPage') === undefined) {
-    stateManager.set('messagesPerPage', 50);
-  }
 
   var app = new MailViewer.App();
 
@@ -76,26 +73,22 @@ Ext.onReady(function () {
 
   var socketIo = io.connect();
   socketIo.on('new message', function (data) {
-    var html = Ext.String.format('<p>{0}</p><b>{1}</b>', data.subject, data.from);
     if (stateManager.get('enableChromeNotifications') === true) {
       if ('Notification' in window) {
         if (Notification.permission !== 'denied') {
           var notification = new Notification('New message received', {
             icon: '/favicon.ico',
-            body: data.subject
+            body: data.data.subject
           });
         }
       }
     }
 
-    /**
-     * if the grids current page is 1, then refresh the messages
-     */
     var messageStore = Ext.StoreMgr.lookup("messageStore");
-    if (messageStore.currentPage === 1) {
-      messageStore.reload();
-    }
+    messageStore.insert(0, data.data);
+
     if (stateManager.get('enableNotifications') === true) {
+      var html = Ext.String.format('<p>{0}</p><b>{1}</b>', data.data.subject, data.data.from.address);
       Ext.toast({
         html: html,
         title: 'New message received',

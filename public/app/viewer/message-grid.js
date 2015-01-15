@@ -7,7 +7,6 @@ Ext.define('MailViewer.MessageGrid', {
       id: 'messagestore',
       storeId: 'messageStore',
       model: 'Message',
-      pageSize: parseInt(Ext.state.Manager.get('messagesPerPage')),
       proxy: {
         type: "ajax",
         appendId: true,
@@ -17,10 +16,6 @@ Ext.define('MailViewer.MessageGrid', {
           rootProperty: 'data',
           totalProperty: 'totalCount'
         }
-      },
-      params: {
-        start: 0,
-        limit: parseInt(Ext.state.Manager.get('messagesPerPage'))
       },
       remoteFilter: true,
       autoLoad: true,
@@ -58,8 +53,6 @@ Ext.define('MailViewer.MessageGrid', {
             Ext.Msg.alert('Error', 'Search term must be more than 3 characters in length');
             return;
           }
-          // always start at zero when performing a query
-          store.proxy.extraParams.start = 0;
           store.proxy.extraParams.q = query;
           store.reload();
         } else {
@@ -138,10 +131,6 @@ Ext.define('MailViewer.MessageGrid', {
                         var values = form.getValues();
                         stateManager.set('enableChromeNotifications', values.enableChromeNotifications);
                         stateManager.set('enableNotifications', values.enableNotifications);
-                        stateManager.set('messagesPerPage', values.messagesPerPage);
-                        var messageStore = Ext.getStore("messageStore");
-                        messageStore.reload({ start: 0, limit: stateManager.get('messagesPerPage') });
-                        Ext.apply(messageStore, {pageSize: stateManager.get('messagesPerPage')});
                         button.up('.window').close();
                       }
                     }
@@ -168,17 +157,6 @@ Ext.define('MailViewer.MessageGrid', {
                         uncheckedValue: false,
                         inputValue: true,
                         name: 'enableNotifications'
-                      });
-                      form.add({
-                        xtype: 'combo',
-                        labelWidth: 150,
-                        fieldLabel: 'Messages per page',
-                        name: 'messagesPerPage',
-                        queryMode: 'local',
-                        store: [25, 50, 75, 100, 125, 150, 175, 200],
-                        value: stateManager.get('messagesPerPage'),
-                        autoSelect: true,
-                        forceSelection: true
                       });
                     }
                   }
@@ -260,7 +238,19 @@ Ext.define('MailViewer.MessageGrid', {
           width: 100,
           resizable: false,
           sortable: false,
-          dataIndex: 'humanSize'
+          renderer: function (size) {
+            var tb = ((1 << 30) * 1024),
+                gb = 1 << 30,
+                mb = 1 << 20,
+                kb = 1 << 10,
+                abs = Math.abs(size);
+            if (abs >= tb) return (Math.round(size / tb * 100) / 100) + 'tb';
+            if (abs >= gb) return (Math.round(size / gb * 100) / 100) + 'gb';
+            if (abs >= mb) return (Math.round(size / mb * 100) / 100) + 'mb';
+            if (abs >= kb) return (Math.round(size / kb * 100) / 100) + 'kb';
+            return size + 'b';
+          },
+          dataIndex: 'size'
         },
         {
           width: 40,
@@ -271,19 +261,7 @@ Ext.define('MailViewer.MessageGrid', {
           dataIndex: 'attachments',
           menuDisabled: true
         }
-      ],
-      // paging bar on the bottom
-      bbar: Ext.create('Ext.PagingToolbar', {
-        store: MessageStore,
-        displayInfo: true,
-        displayMsg: 'Displaying messages {0} - {1} of {2}',
-        emptyMsg: "No messages to display",
-        listeners: {
-          afterrender: function () {
-            this.child('#refresh').hide();
-          }
-        }
-      })
+      ]
     });
     this.callParent(arguments);
     this.on('selectionchange', this.onSelect, this);
@@ -392,7 +370,7 @@ Ext.define('MailViewer.MessageGrid', {
     var selected = selections[0];
     this.setRead(selected);
     if (selected) {
-      this.fireEvent('select', this, selected);
+      //  this.fireEvent('select', this, selected);
     }
   },
 

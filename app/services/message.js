@@ -22,20 +22,25 @@ module.exports = function (models) {
           logger.error('Error creating message', err);
           return done(err);
         }
-        async.forEach(builder.getAttachments(), function (attachment, callback) {
-          savedMessage.addAttachment(attachment, function (err) {
+        var attachments = builder.getAttachments();
+        if (attachments !== null) {
+          async.forEach(builder.getAttachments(), function (attachment, callback) {
+            savedMessage.addAttachment(attachment, function (err) {
+              if (err) {
+                return callback(err);
+              }
+              return callback(null);
+            });
+          }, function (err) {
             if (err) {
-              return callback(err);
+              logger.error('Error creating attachments for message', err);
+              return done(err);
             }
-            return callback(null);
+            return done(null, savedMessage);
           });
-        }, function (err) {
-          if (err) {
-            logger.error('Error creating attachments for message', err);
-            return done(err);
-          }
-        });
-        return done(null, savedMessage);
+        } else {
+          return done(null, savedMessage);
+        }
       });
     }
   };

@@ -21,7 +21,6 @@ Ext.define('FeedViewer.Message', {
           htmlBody.setHeight(body.getHeight() - messageDetails.getHeight());
         }
       }, 500);
-
       panel.el.on('click', function (e, t) {
         if (t.id === 'html') {
           panel.data.viewMode = 1;
@@ -43,12 +42,12 @@ Ext.define('FeedViewer.Message', {
   tpl: [
     '<div class="message-details">',
     '<span class="date">{received:this.formatDate}</span>',
-    '<h4 class="meta"><b>From:</b> {[this.formatFrom(values.fromAddress, values.fromName)]}</h4>',
+    '<h4 class="meta"><b>From:</b> {[this.formatFrom(values.from.address, values.from.name)]}</h4>',
     '<h4 class="meta"><b>Subject:</b> {subject}</h4>',
     '<h4 class="meta"><b>To:</b> {recipients:this.formatRecipients} </h4>',
     '<h4 class="meta"><b>CC:</b> {ccs:this.formatRecipients} </h4>',
     '<tpl if="attachments.length &gt; 0">',
-    '<h4 class="meta"><b>Attachments: {[this.formatAttachments(values.attachments, values.id)]}</b></h4>',
+    '<h4 class="meta"><b>Attachments: {[this.formatAttachments(values.attachments, values._id)]}</b></h4>',
     '</tpl>',
     '<ul class="tabs">',
     '<tpl if="viewMode == 1">',
@@ -119,9 +118,9 @@ Ext.define('FeedViewer.Message', {
         var html = '';
         attachments.forEach(function (attachment) {
           if (/image\/jpeg|image\/png|image\/gif/.test(attachment.contentType)) {
-            html += Ext.String.format('<a class="attachment-image" href="/messages/{0}/attachments/{1}?download">{2}</a>', id, attachment.id, attachment.name);
+            html += Ext.String.format('<a class="attachment-image" href="/messages/{0}/attachments/{1}?download">{2}</a>', id, attachment._id, attachment.name);
           } else {
-            html += Ext.String.format('<a  target="_blank" href="/messages/{0}/attachments/{1}?download">{2}</a>', id, attachment.id, attachment.name);
+            html += Ext.String.format('<a  target="_blank" href="/messages/{0}/attachments/{1}?download">{2}</a>', id, attachment._id, attachment.name);
           }
         });
         return html;
@@ -131,6 +130,7 @@ Ext.define('FeedViewer.Message', {
     this.callParent(arguments);
   },
   setActive: function (rec) {
+    console.log('called once');
     var me = this;
     me.active = rec;
     rec.data.viewMode = (rec.data.hasHtml) ? 1 : 2;

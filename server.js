@@ -96,20 +96,70 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
   });
 
   var smtpServer = smtp.createServer(function (req) {
+    var MailParser = require("mailparser").MailParser;
+    var MessageBuilder = require('./app/services/message-builder');
+    var models = {
+      message: mongoose.model('message', require(path.join(__dirname, '/app/models/message'))),
+      attachment: mongoose.model('attachment', require(path.join(__dirname, '/app/models/attachment')))
+    };
+    var messageService = require('./app/services/message')(models);
+    var mp = new MailParser({ debug: false, streamAttachments: false });
+
     req.on('message', function (stream, ack) {
-      logger.smtp.info('Received message from: %s', req.from);
-      stream.pipe(request.post(util.format('http://%s:%d/messages', httpIp, httpPort))
-        .on('response', function (response) {
-          if (response.statusCode !== 201) {
-            logger.http.error('Error persisting message to database from: %s', req.from);
-          } else {
-            logger.http.info('Persisted messages to database from: %s', req.from);
-          }
-        })
-        .on('error', function () {
-          logger.http.error('Error creating message from: %s with error', req.from);
-        }), { end: true });
       ack.accept();
+      process.nextTick(function () {
+        var data = '';
+        stream.on('data', function (d) {
+          data += d;
+        });
+
+        stream.on('end', function () {
+          mp.on('end', function (mail) {
+            /**
+             * safe to assume if we don't have a recipient address then the email is invalid.
+             * Unfortunately mailparser does not emit errors :-(
+             */
+            if (mail.to === undefined) {
+              logger.http.error('Invalid email sent');
+              return;
+            }
+            var builder = new MessageBuilder(mail, data);
+            messageService.create(builder, function (err, message) {
+              if (err) {
+                logger.http.error('Error persisting message from %s to database', message.from.address);
+                return;
+              }
+              logger.http.info('Persisted message from %s to database', message.from.address);
+
+              models.message.findById(message._id, 'subject from received read size recipients ccs attachments html')
+                .populate('attachments', 'name contentType size contentId').lean().exec(function (err, message) {
+                  if (message.html) {
+                    message.hasHtml = true;
+                    delete message.html;
+                  }
+                  app.io.broadcast('new message', { data: message });
+                });
+            });
+          });
+
+          mp.write(data);
+          mp.end();
+        });
+      });
+
+//      logger.smtp.info('Received message from: %s', req.from);
+//      stream.pipe(request.post(util.format('http://%s:%d/messages', httpIp, httpPort))
+//        .on('response', function (response) {
+//          if (response.statusCode !== 201) {
+//            logger.http.error('Error persisting message to database from: %s', req.from);
+//          } else {
+//            logger.http.info('Persisted messages to database from: %s', req.from);
+//          }
+//        })
+//        .on('error', function (err) {
+//          logger.http.error('Error creating message from: %s with error', req.from, err);
+//        }), { end: true });
+//      ack.accept();
     });
   });
 
