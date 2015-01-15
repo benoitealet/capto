@@ -5,9 +5,7 @@ var pkg = require('../package.json'),
     program = require('commander'),
     path = require('path'),
     settings = require(path.resolve(__dirname, '../app/config/settings')),
-    Server = require(path.resolve(__dirname, '../server.js')),
-    async = require('async'),
-    util = require('util');
+    Server = require(path.resolve(__dirname, '../server.js'));
 
 program.version(version, '--version');
 program.command('run')
