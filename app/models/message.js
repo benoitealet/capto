@@ -5,17 +5,8 @@ var Schema = mongoose.Schema;
 var _ = require('lodash');
 var pretty = require('prettysize');
 
-var attachmentSchema = mongoose.Schema({
-  checksum: String,
-  name: String,
-  size: Number,
-  content: Buffer,
-  contentId: String,
-  contentType: String
-});
 
-
-var messageSchema = new Schema({
+var message = new Schema({
   subject: {
     type: String
   },
@@ -62,7 +53,10 @@ var messageSchema = new Schema({
     default: false
   },
   attachments: [
-    attachmentSchema
+    { type: Schema.Types.ObjectId,
+      ref: 'attachment'
+    }
+
   ],
   size: {
     type: Number
@@ -72,15 +66,35 @@ var messageSchema = new Schema({
   toJSON: { virtuals: true }
 });
 
-messageSchema.virtual('humanSize').get(function () {
+message.virtual('humanSize').get(function () {
   return pretty(this.size)
 });
-messageSchema.virtual('hasHtml').get(function () {
+message.virtual('hasHtml').get(function () {
   return this.html ? true : false;
 });
 
-messageSchema.plugin(textSearch);
+message.plugin(textSearch);
 
-messageSchema.index({ source: 'text' });
+message.index({ source: 'text' });
 
-module.exports = messageSchema;
+message.methods.addAttachment = function (attachment, cb) {
+  var _this = this;
+  this.model('attachment').create(attachment, function (err, attachment) {
+    if (err) {
+      return cb('Error creating attachment');
+    }
+    _this.attachments.push(attachment);
+    _this.save(cb);
+  });
+};
+
+message.pre('remove', function (next) {
+  this.model('attachment').remove({ _id: {$in: this.attachments}}, function (err) {
+    if (err) {
+      return next(err);
+    }
+    return next();
+  })
+});
+
+module.exports = message;

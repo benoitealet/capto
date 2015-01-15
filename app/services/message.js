@@ -17,17 +17,24 @@ module.exports = function (models) {
         message.headers.push(header);
       });
 
-      _.forEach(builder.getAttachments(), function (attachment) {
-        console.log('Attachment length', attachment.content.length);
-        message.attachments.push(attachment);
-      });
-
-
       message.save(function (err, savedMessage) {
         if (err) {
           logger.error('Error creating message', err);
           return done(err);
         }
+        async.forEach(builder.getAttachments(), function (attachment, callback) {
+          savedMessage.addAttachment(attachment, function (err) {
+            if (err) {
+              return callback(err);
+            }
+            return callback(null);
+          });
+        }, function (err) {
+          if (err) {
+            logger.error('Error creating attachments for message', err);
+            return done(err);
+          }
+        });
         return done(null, savedMessage);
       });
     }

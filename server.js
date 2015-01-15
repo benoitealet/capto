@@ -48,8 +48,10 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
 
   app.use(function (req, res, next) {
     req.models = {
-      message: mongoose.model('message', require(path.join(__dirname, '/app/models/message')))
+      message: mongoose.model('message', require(path.join(__dirname, '/app/models/message'))),
+      attachment: mongoose.model('attachment', require(path.join(__dirname, '/app/models/attachment')))
     };
+    req.settings = settings;
     next();
   });
 

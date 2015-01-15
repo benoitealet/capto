@@ -54,7 +54,7 @@ Ext.define('MailViewer.MessageGrid', {
       performQuery: function (query) {
         var store = MessageStore;
         if (query) {
-          if (query.length < 3) {
+          if (query.length <= 3) {
             Ext.Msg.alert('Error', 'Search term must be more than 3 characters in length');
             return;
           }
