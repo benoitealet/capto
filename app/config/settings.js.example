@@ -1,14 +1,12 @@
 'use strict';
 
 var settings = {
+var settings = {
   database: {
-    host: 'localhost',
-    database: 'capto',
-    user: 'capto',
-    password: 'capto',
-    protocol: 'mysql',
-    port: '3306',
-    query: { pool: true }
+    options: { server: {  auto_reconnect: true, socketOptions: { keepAlive: 1 } } },
+    url: 'mongodb://localhost/capto',
+    debug: false,
+    textSearchLanguage: 'english'
   },
   smtp: {
     port: 9025,
