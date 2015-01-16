@@ -27,7 +27,12 @@ program.command('run')
     /**
      * Instantiate new server instance
      */
-    new Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize);
+    new Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize).run(function (err) {
+      if (err) {
+        console.error('Exiting');
+        process.exit(0);
+      }
+    });
   });
 program.parse(process.argv);
 

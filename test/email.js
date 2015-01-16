@@ -11,14 +11,16 @@ var smtpTransport = require('nodemailer-smtp-transport');
 
 var transporter = nodemailer.createTransport(smtpTransport({
   host: 'localhost',
-  port: 9025,
+  port: 465,
+  secure: false,
+  debug: true,
   ignoreTLS: true
 }));
 /**
  * Generate some random emails
  */
 var randomSubjects = ['Order confirmation', 'Please activate your account', 'Your account has been activated!', 'Forgot password', 'Payment received', 'Hey! Don\'t miss out on these deals', 'Introducing our new design', 'New messages from Joe Bloggs'];
-for (var i = 0; i <= 0; i++) {
+for (var i = 0; i <= 10; i++) {
   transporter.sendMail({
     from: chance.name({ middle: true }) + '<' + chance.email({domain: "example.com"}) + '>',
     to: chance.name({ middle: true }) + '<' + chance.email({domain: "example.com"}) + '>',

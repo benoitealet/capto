@@ -9,7 +9,8 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
       util = require('util'),
       favicon = require('serve-favicon'),
       mongoose = require('mongoose'),
-      through2 = require('through2');
+      through2 = require('through2'),
+      async = require('async');
 
   var app = express();
   app.http().io();
@@ -27,11 +28,8 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
     });
   });
 
-  /** Setup mongoose **/
-
   mongoose.set('debug', settings.database.debug);
 
-// Connect to mongodb
   var connect = function () {
     mongoose.connect(settings.database.url, settings.database.options);
   };
@@ -40,12 +38,10 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
   mongoose.connection.on('error', logger.http.error);
   mongoose.connection.on('disconnected', connect);
 
-
   // view engine setup
   app.set('views', path.join(__dirname, '/app/views'));
   app.set('view engine', 'jade');
   app.use(express.static(path.join(__dirname, 'public')));
-
 
   app.use(function (req, res, next) {
     req.models = {
@@ -92,10 +88,6 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
 
   app.set('port', process.env.PORT || 9024);
 
-  var server = app.listen(httpPort, httpIp, function () {
-    logger.http.info('Express server listening on port %d and address %s', server.address().port, server.address().address);
-  });
-
   var smtpServer = smtp.createServer(function (req) {
     var MailParser = require("mailparser").MailParser;
     var MessageBuilder = require('./app/services/message-builder');
@@ -123,8 +115,10 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
     };
 
     req.on('message', function (stream, ack) {
+      logger.smtp.info('Received message from %s', req.from);
       ack.accept();
       var data = '';
+
       stream.pipe(limit(maxMessageSize)
         .on('data', function (d) {
           data += d;
@@ -169,10 +163,34 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
         });
     });
   });
-
-  smtpServer.listen(smtpPort, smtpIp, function () {
-    logger.smtp.info('SMTP server listening on port %d and address %s', smtpServer.address().port, smtpServer.address().address);
-  });
+  return {
+    run: function (done) {
+      async.series([ function (callback) {
+        var server = app.listen(httpPort, httpIp, function () {
+          logger.http.info('HTTP server listening on port %d and address %s', server.address().port, server.address().address);
+          callback();
+        }).on('error', function (err) {
+          logger.http.error('Error starting HTTP server', err);
+          callback(err);
+        });
+      }, function (callback) {
+        smtpServer.listen(smtpPort, smtpIp, function () {
+          var port = smtpServer.address().port,
+              address = smtpServer.address().address;
+          logger.smtp.info('SMTP server listening on port %d and address %s', port, address);
+          callback();
+        }).on('error', function (err) {
+          logger.smtp.error('Error starting SMTP server', err);
+          callback(err);
+        });
+      }], function (err) {
+        if (err) {
+          done(err);
+        }
+        done(null);
+      });
+    }
+  }
 }
 
 module.exports = Server;

@@ -44,14 +44,14 @@ module.exports = {
         .select('subject from received read size recipients ccs attachments html')
         .populate('attachments', 'name contentType size contentId').lean()
         .exec(function (err, messages) {
-        if (err) {
-          logger.http.error('Error querying messages with query of %s and error %s', q, err);
-          return res.status(400).send('Error');
-        }
+          if (err) {
+            logger.http.error('Error querying messages with query of %s and error %s', q, err);
+            return res.status(400).send('Error');
+          }
           if (messages.length === 0) {
-          logger.http.info('Fetched no messages matching query %s', q);
-          return res.json({ data: []});
-        }
+            logger.http.info('Fetched no messages matching query %s', q);
+            return res.json({ data: []});
+          }
           logger.http.info('Fetched %d messages matching query %s', messages.length, q);
           return res.status(200).json({ data: _.map(messages, function (message) {
             if (message.html) {
@@ -87,7 +87,7 @@ module.exports = {
         logger.http.error('Failed to fetch unread message count', err);
         return res.status(500).json(err);
       }
-      logger.http.info('Fetch %d unread message count', count);
+      logger.http.info('Fetched %d unread message count', count);
       return res.status(200).json({ totalCount: count });
     });
   },
