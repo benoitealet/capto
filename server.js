@@ -8,7 +8,8 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
       request = require('request'),
       util = require('util'),
       favicon = require('serve-favicon'),
-      mongoose = require('mongoose');
+      mongoose = require('mongoose'),
+      through2 = require('through2');
 
   var app = express();
   app.http().io();
@@ -96,8 +97,6 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
   });
 
   var smtpServer = smtp.createServer(function (req) {
-
-
     var MailParser = require("mailparser").MailParser;
     var MessageBuilder = require('./app/services/message-builder');
     var models = {
@@ -107,32 +106,54 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
     var messageService = require('./app/services/message')(models);
     var mp = new MailParser({ debug: false, streamAttachments: false });
 
+    /**
+     * Reject a message if it is larger than the specified max message length
+     * @param length - bytes
+     */
+    var limit = function (length) {
+      var streamLength = 0;
+      return through2(function (chunk, enc, callback) {
+        streamLength += chunk.length;
+        if (streamLength > length) {
+          callback({ code: 552, message: 'Requested mail action aborted: exceeded storage allocation' });
+        } else {
+          callback(null, chunk);
+        }
+      });
+    };
+
     req.on('message', function (stream, ack) {
       ack.accept();
-      process.nextTick(function () {
-        var data = '';
-        stream.on('data', function (d) {
+      var data = '';
+      stream.pipe(limit(maxMessageSize)
+        .on('data', function (d) {
           data += d;
-        });
-
-        stream.on('end', function () {
+        }))
+        .on('error', function (err) {
+          if (err.code === 552) {
+            logger.smtp.error('Rejected message: %s', err.message);
+            ack.reject(err.code, err.message);
+          } else {
+            logger.smtp.error('Error processing message', err);
+          }
+        })
+        .on('end', function () {
           mp.on('end', function (mail) {
             /**
              * safe to assume if we don't have a recipient address then the email is invalid.
              * Unfortunately mailparser does not emit errors :-(
              */
             if (mail.to === undefined) {
-              logger.http.error('Invalid email sent');
+              logger.smtp.error('Invalid email sent');
               return;
             }
             var builder = new MessageBuilder(mail, data);
             messageService.create(builder, function (err, message) {
               if (err) {
-                logger.http.error('Error persisting message from %s to database', message.from.address);
+                logger.smtp.error('Error persisting message from %s to database', message.from.address);
                 return;
               }
-              logger.http.info('Persisted message from %s to database', message.from.address);
-
+              logger.smtp.info('Persisted message from %s to database', message.from.address);
               models.message.findById(message._id, 'subject from received read size recipients ccs attachments html')
                 .populate('attachments', 'name contentType size contentId').lean().exec(function (err, message) {
                   if (message.html) {
@@ -143,11 +164,9 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
                 });
             });
           });
-
           mp.write(data);
           mp.end();
         });
-      });
     });
   });
 
