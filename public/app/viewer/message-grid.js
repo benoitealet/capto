@@ -416,7 +416,7 @@ Ext.define('MailViewer.MessageGrid', {
     if (value.name) {
       return Ext.String.format('{0} &lt;{1}&gt;', value.name, value.address);
     }
-    return value.from.address;
+    return value.address;
   }
 })
 ;
