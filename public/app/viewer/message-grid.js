@@ -322,7 +322,7 @@ Ext.define('MailViewer.MessageGrid', {
 
   deleteMessage: function (view, record) {
     Ext.Ajax.request({
-      url: '/messages/' + record.get('id'),
+      url: '/messages/' + record.get('_id'),
       method: 'DELETE',
       success: function (response) {
         /**
