@@ -11,7 +11,7 @@ var smtpTransport = require('nodemailer-smtp-transport');
 
 var transporter = nodemailer.createTransport(smtpTransport({
   host: 'localhost',
-  port: 465,
+  port: 9025,
   secure: false,
   debug: true,
   ignoreTLS: true
