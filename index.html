@@ -31,21 +31,17 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <h4>
-<a id="development-email-testing-made-easy" class="anchor" href="#development-email-testing-made-easy" aria-hidden="true"><span class="octicon octicon-link"></span></a>Development email testing made easy</h4>
+        <h2>
+<a id="development-email-testing-made-easy" class="anchor" href="#development-email-testing-made-easy" aria-hidden="true"><span class="octicon octicon-link"></span></a>Development email testing made easy</h2>
 
-<p>Capto runs a simple SMTP server that captures any messages sent to it and displays it in a web interface.  No messages are relayed to any email addresses.</p>
+<p>Capto runs a simple SMTP server that captures any message sent to it, persists it into a mongodb collection and displays it in a web interface.  No messages are relayed to any email addresses. The backend is written in NodeJs using the Express framework and the frontend is driven by ExtJs 5.</p>
 
-<p><img src="https://raw.githubusercontent.com/Flukey/capto/master/docs/screenshots/screenshot.png" alt="Screenshot"></p>
-
-<blockquote>
-<p>This project is under active development and may contain bugs. Feedback is very welcome. All contributions are also very welcome.</p>
-</blockquote>
+<p><img src="https://raw.githubusercontent.com/jamhall/capto/master/docs/screenshots/screenshot.png" alt="Screenshot"></p>
 
 <p><a href="https://nodei.co/npm/capto/"><img src="https://nodei.co/npm/capto.png" alt="NPM"></a></p>
 
-<h4>
-<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h4>
+<h3>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h3>
 
 <ul>
 <li>Catches all mail and stores it for display.</li>
@@ -62,12 +58,101 @@
 <li>Open an email in a new tab (like thunderbird)</li>
 <li>Post an <em>eml</em> file via the API and view it in the interface</li>
 <li>Mark as read, delete messages and navigate messages via pagination controls</li>
+<li>RESTful API (please see below for more information)</li>
 </ul>
 
-<p>The backend is written in NodeJs using the Express framework and the frontend is driven by ExtJs 5.</p>
+<h3>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h3>
+
+<blockquote>
+<p>Capto requires a MongoDB instance. If you wish to have full text search working, you will need to be running Mongo 2.6 or greater.</p>
+</blockquote>
+
+<p>To get started, install capto (may require sudo privileges):</p>
+
+<pre><code>npm install -g capto
+</code></pre>
+
+<p>Change directory to the <em>node modules</em> directory:</p>
+
+<pre><code>cd /usr/local/lib/node_modules/capto/app/config/
+</code></pre>
+
+<p>Copy the <em>settings.js.example</em> to <em>settings.js</em>. Modify the settings to match your requirements</p>
+
+<p>To run the HTTP and SMTP server with the default options:</p>
+
+<pre><code>capto run
+</code></pre>
+
+<p>There are a few options you can set:</p>
+
+<pre><code>  Usage: run [options]
+
+  Options:
+
+    -h, --help                 output usage information
+    --smtp-ip [address]        Set the ip address for the http server
+    --http-ip [address]        Set the ip address for the smtp server
+    --smtp-port [port]         Set the port of the smtp server
+    --http-port [port]         Set the port of the http server
+    --max-message-size [size]  Set the max message size the smtp server will accept in bytes
+</code></pre>
+
+<p>Now open: http://localhost:9024 to view the web interface. Send messages to <em>smtp://127.0.0.1:9025</em>.</p>
+
+<blockquote>
+<p>Please note: The max message size is 10mb.  You can reduce this limit by setting the appropriate option either via the command line options or in the settings file</p>
+</blockquote>
+
+<h3>
+<a id="configuring-a-mail-library-to-send-messages-to-capto" class="anchor" href="#configuring-a-mail-library-to-send-messages-to-capto" aria-hidden="true"><span class="octicon octicon-link"></span></a>Configuring a mail library to send messages to capto</h3>
 
 <h4>
-<a id="api" class="anchor" href="#api" aria-hidden="true"><span class="octicon octicon-link"></span></a>API</h4>
+<a id="django" class="anchor" href="#django" aria-hidden="true"><span class="octicon octicon-link"></span></a>Django</h4>
+
+<p>For use in Django, simply add the following configuration to your projects' settings.py</p>
+
+<pre><code>if DEBUG:
+    EMAIL_HOST = '127.0.0.1'
+    EMAIL_HOST_USER = ''
+    EMAIL_HOST_PASSWORD = ''
+    EMAIL_PORT = 9025
+    EMAIL_USE_TLS = False
+</code></pre>
+
+<h4>
+<a id="nodejs" class="anchor" href="#nodejs" aria-hidden="true"><span class="octicon octicon-link"></span></a>NodeJs</h4>
+
+<p>Using <a href="https://github.com/andris9/Nodemailer">Node mailer</a></p>
+
+<pre><code>var nodemailer = require('nodemailer');
+var smtpTransport = require('nodemailer-smtp-transport');
+var transporter = nodemailer.createTransport(smtpTransport({
+  host: 'localhost',
+  port: 9025,
+  secure: false,
+  debug: true,
+  ignoreTLS: true
+}));
+</code></pre>
+
+<h4>
+<a id="rails" class="anchor" href="#rails" aria-hidden="true"><span class="octicon octicon-link"></span></a>Rails</h4>
+
+<p>To set up your rails app, I recommend adding this to your environments/development.rb:</p>
+
+<pre><code>config.action_mailer.delivery_method = :smtp
+config.action_mailer.smtp_settings = { :address =&gt; "localhost", :port =&gt; 9025 }
+</code></pre>
+
+<h3>
+<a id="contributions" class="anchor" href="#contributions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributions</h3>
+
+<p>All contributions and bug reports are very welcome!</p>
+
+<h3>
+<a id="api" class="anchor" href="#api" aria-hidden="true"><span class="octicon octicon-link"></span></a>API</h3>
 
 <p>The backend exposes a RESTful API:</p>
 
@@ -138,79 +223,15 @@
 </tbody>
 </table>
 
-<h4>
-<a id="to-do" class="anchor" href="#to-do" aria-hidden="true"><span class="octicon octicon-link"></span></a>To do</h4>
-
-<ul>
-<li>Write tests in Mocha</li>
-<li><del>Implement Google Chrome notification API when a new message is received</del></li>
-<li><del>Implement web sockets for when a new message is received?</del></li>
-<li><del>Open images in a lightbox</del></li>
-<li><del>Implement full text search</del></li>
-<li>Implement column sorting (received, subject etc.)</li>
-<li><del>Implement CLI entry point (.ie. bin/capto)</del></li>
-</ul>
-
-<h4>
-<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h4>
-
-<blockquote>
-<p>Capto requires a MySQL database. The code project was originally designed to use SQLite, however, due to nodes asynchronous nature,  database writes were failing when multiple requests were sent in quick succession. </p>
-</blockquote>
-
-<p>To get started, install capto (may require sudo privileges):</p>
-
-<pre><code>npm install -g capto
-</code></pre>
-
-<p>Change directory to the <em>node modules</em> directory:</p>
-
-<pre><code>cd /usr/local/lib/node_modules/capto/app/config/
-</code></pre>
-
-<p>Copy the <em>settings.js.example</em> to <em>settings.js</em></p>
-
-<p>Change the settings to your MySQL database (make sure you've created the database). Then run:</p>
-
-<pre><code>capto db:setup
-</code></pre>
-
-<p>Your database should now be ready. To run the HTTP and SMTP server run:</p>
-
-<pre><code>capto run
-</code></pre>
-
-<p>Now open: http://localhost:9024 to view the web interface. Send messages to <em>smtp://127.0.0.1:9025</em>.</p>
-
-<blockquote>
-<p>Please note: The default max message size is 25mb. You can send a message greater than this value and the SMTP server will accept it, however, once processed it will be rejected and will not be persisted to the database. You can increase or decrease this default value in the <em>settings.js</em> file or pass in the option <em>--max-message-length</em> when running the <em>capto run</em> command.</p>
-</blockquote>
-
-<p>The <em>capto run</em> command offers a few options:</p>
-
-<pre><code>  capto run --help
-
-  Usage: run [options]
-
-  Options:
-
-    -h, --help                 output usage information
-    --smtp-ip [address]        Set the ip address for the http server
-    --http-ip [address]        Set the ip address for the smtp server
-    --smtp-port [port]         Set the port of the smtp server
-    --http-port [port]         Set the port of the http server
-    --max-message-size [size]  Set the max message size the smtp server will accept in bytes
-</code></pre>
-
-<h4>
-<a id="thanks" class="anchor" href="#thanks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Thanks</h4>
+<h3>
+<a id="thanks" class="anchor" href="#thanks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Thanks</h3>
 
 <p>Many thanks to <a href="https://github.c/sj26">sj26</a> for his excellent <a href="https://github.com/sj26/mailcatcher">mailcatcher</a> project for the inspiration for this project.</p>
 
 <p>Many thanks also goes to the many developers who have contributed to the various libraries used in this project.</p>
 
-<h4>
-<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h4>
+<h3>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h3>
 
 <p>GPLv3. See LICENSE file in the source.</p>
       </section>
