@@ -78,7 +78,7 @@ Ext.onReady(function () {
         if (Notification.permission !== 'denied') {
           var notification = new Notification('New message received', {
             icon: '/favicon.ico',
-            body: data.data.subject
+            body: (data.data.subject) || 'No subject'
           });
         }
       }
@@ -88,7 +88,7 @@ Ext.onReady(function () {
     messageStore.insert(0, data.data);
 
     if (stateManager.get('enableNotifications') === true) {
-      var html = Ext.String.format('<p>{0}</p><b>{1}</b>', data.data.subject, data.data.from.address);
+      var html = Ext.String.format('<p>{0}</p><b>{1}</b>', data.data.subject || 'No subject', data.data.from.address);
       Ext.toast({
         html: html,
         title: 'New message received',
