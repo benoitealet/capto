@@ -131,7 +131,7 @@ module.exports = {
   },
   getHtml: function (req, res) {
     var id = req.params.id;
-    req.models.message.findById(id, 'html', function (err, message) {
+    req.models.message.findById(id).select('html attachments').populate({ path: 'attachments', select: 'contentId' }).exec(function (err, message) {
       if (err || !message) {
         logger.http.error('Message not found for id: %s', id);
         return res.status(404).send('Message not found');
@@ -142,7 +142,7 @@ module.exports = {
         html = message.html;
         _.forEach(message.attachments, function (attachment) {
           html = html.replace("cid:" + attachment.contentId,
-            util.format('/messages/%d/attachments/%d?download', message.id, attachment.id));
+            util.format('/messages/%s/attachments/%s?download', message.id, attachment.id));
         });
       } else {
         logger.http.info('Html does not exist for message with id: %s', id);
