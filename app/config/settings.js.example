@@ -1,7 +1,6 @@
 'use strict';
 
 var settings = {
-var settings = {
   database: {
     options: { server: {  auto_reconnect: true, socketOptions: { keepAlive: 1 } } },
     url: 'mongodb://localhost/capto',
