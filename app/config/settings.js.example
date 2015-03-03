@@ -10,8 +10,8 @@ var settings = {
   smtp: {
     port: 9025,
     ip: '127.0.0.1',
-    // defaults to 25mb
-    maxMessageSize: 25000000
+    // defaults to 10mb
+    maxMessageSize: 10000000
   },
   http: {
     port: 9024,
