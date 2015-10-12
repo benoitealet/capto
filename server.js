@@ -30,11 +30,12 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
 
   mongoose.set('debug', settings.database.debug);
 
-  var connect = function () {
-    mongoose.connect(settings.database.url, settings.database.options);
-  };
+  var connect = function() {
+    mongoose.connect(settings.database.url, settings.database.options, function(err) {
+      if (err) throw err;
+    });
+  }
   connect();
-
   mongoose.connection.on('error', logger.http.error);
   mongoose.connection.on('disconnected', connect);
 
