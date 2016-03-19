@@ -390,7 +390,7 @@ Ext.define('MailViewer.MessageGrid', {
           icon: '/images/trash.png',
           text: 'Delete message',
           handler: function () {
-            _this.deleteMessage(view, record);
+            _this.deleteMessage(view, record, true);
           }
         }
       ]
@@ -406,7 +406,7 @@ Ext.define('MailViewer.MessageGrid', {
   onRowClick: function (view, record, item, index, e) {
     this.setRead(record);
   },
-  deleteMessage: function (view, record) {
+  deleteMessage: function (view, record, reload) {
     Ext.Ajax.request({
       url: '/messages/' + record.get('_id'),
       method: 'DELETE',
@@ -416,8 +416,10 @@ Ext.define('MailViewer.MessageGrid', {
          */
         var messageContainer = Ext.getCmp('messagecontainer');
         messageContainer.removeTab(record);
-        view.getStore().reload();
-        Ext.data.StoreMgr.lookup('originStore').reload()
+        if(reload) {
+          view.getStore().reload();
+          Ext.data.StoreMgr.lookup('originStore').reload()
+        }
       }, failure: function () {
         Ext.Msg.alert('Error', 'Couldn\'t delete message :-(');
       }
@@ -446,8 +448,9 @@ Ext.define('MailViewer.MessageGrid', {
 
     if (e.getKey() === Ext.EventObject.DELETE) {
       var that = this;
-      view.getSelectionModel().getSelection().forEach(function (r) {
-        that.deleteMessage(view, r);
+      var count = view.getSelectionModel().getSelection().length;
+      view.getSelectionModel().getSelection().forEach(function (r, i) {
+        that.deleteMessage(view, r, (i == count-1));
       });
 
     }

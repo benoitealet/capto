@@ -130,7 +130,6 @@ Ext.define('FeedViewer.Message', {
         this.callParent(arguments);
     },
     setActive: function (rec) {
-        console.log('called once');
         var me = this;
         me.active = rec;
         rec.data.viewMode = (rec.data.hasHtml) ? 1 : 2;
