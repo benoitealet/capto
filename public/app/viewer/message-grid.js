@@ -1,6 +1,9 @@
 Ext.define('MailViewer.MessageGrid', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.messagegrid',
+  selModel: {
+    mode: 'MULTI'
+  },
   initComponent: function () {
     var MessageStore = Ext.create('Ext.data.Store', {
       id: 'messagestore',
@@ -160,8 +163,8 @@ Ext.define('MailViewer.MessageGrid', {
           itemcontextmenu: this.onContextMenu
         }
       },
-      enableColumnMove: false,
-      enableColumnHide: false,
+      enableColumnMove: true,
+      enableColumnHide: true,
       layout: 'fit',
       reserveScrollbar: true,
       sortableColumns: false,
@@ -440,8 +443,13 @@ Ext.define('MailViewer.MessageGrid', {
     }
   },
   onRowKeyDown: function (view, record, item, index, e) {
+
     if (e.getKey() === Ext.EventObject.DELETE) {
-      this.deleteMessage(view, record);
+      var that = this;
+      view.getSelectionModel().getSelection().forEach(function (r) {
+        that.deleteMessage(view, r);
+      });
+
     }
   },
   /**
