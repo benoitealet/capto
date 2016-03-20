@@ -48,7 +48,9 @@ Ext.define('MailViewer.App', {
         {name: 'size', type: 'int'},
         {name: 'hasHtml', type: 'boolean'},
         {name: 'hasPlain', type: 'boolean'},
-        {name: 'humanSize', type: 'string'}
+        {name: 'humanSize', type: 'string'},
+        {name: 'deliveryDate', type: 'date'},
+        {name: '_deliveryMail', type: 'string'}, // not persisted, only to send destination to nodejs while saving
       ],
       hasMany: {
         model: 'MailViewer.model.MessageRecipient', name: 'recipients'

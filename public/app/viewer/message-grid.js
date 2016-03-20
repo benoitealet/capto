@@ -47,6 +47,27 @@ Ext.define('MailViewer.MessageGrid', {
       }
     });
 
+    var ForwardDestStore = Ext.create('Ext.data.Store', {
+      id: 'forwarddeststore',
+      storeId: 'forwardDestStore',
+      fields: ['mail'],
+      proxy: {
+        type: 'localstorage',
+        id: 'forwarddeststore',
+      },
+      autoLoad: true,
+    });
+
+    Ext.define('Search', {
+      fields: ['id', 'query'],
+      extend: 'Ext.data.Model',
+      proxy: {
+        type: 'localstorage',
+        id: 'twitter-Searches'
+      }
+    });
+
+
     Ext.define('MailViewer.MessageGrid.OriginTrigger', {
       extend: 'Ext.form.field.ComboBox',
       alias: 'widget.messagegridorigintrigger',
@@ -158,7 +179,7 @@ Ext.define('MailViewer.MessageGrid', {
         listeners: {
           scope: this,
           itemdblclick: this.onRowDblClick,
-          itemclick: this.onRowClick,
+          //itemclick: this.onRowClick,
           itemkeydown: this.onRowKeyDown,
           itemcontextmenu: this.onContextMenu
         }
@@ -193,6 +214,85 @@ Ext.define('MailViewer.MessageGrid', {
         },
         {
           xtype: 'button',
+          text: 'Forward to ..',
+          icon: '/images/forwardTo.png',
+          handler: function () {
+            var selection = Ext.getCmp('messagegrid').getSelection();
+            if (selection.length) {
+              Ext.create('Ext.window.Window', {
+                title: 'Forward to',
+                width: 400,
+                layout: 'fit',
+                modal: true,
+                items: [
+                  {
+                    xtype: 'form',
+                    border: false,
+                    bodyPadding: 5,
+                    buttons: [
+                      {
+                        text: 'Send',
+                        handler: function (button) {
+
+                          var form = button.up('form').getForm();
+                          var values = form.getValues();
+                          //todo check if values.forwardToMail is real email
+                          selection.forEach(function (r, i) {
+
+                            Ext.getCmp('messagegrid').deliverMessage(r, values.forwardToMail);
+
+                          });
+                          if(Ext.getStore('forwardDestStore').find('email', values.forwardToMail) == -1) {
+                            Ext.getStore('forwardDestStore').add({email: values.forwardToMail})
+                            Ext.getStore('forwardDestStore').sort('email', 'asc');
+                          }
+                          button.up('window').close();
+                        }
+                      },
+                      {
+                        text: 'Cancel',
+                        handler: function (button) {
+                          button.up('window').close();
+                        }
+                      }
+                    ],
+                    listeners: {
+                      beforerender: function (form) {
+                        form.add({
+                          xtype: 'combo',
+                          store: ForwardDestStore,
+                          queryMode: 'local',
+                          displayField: 'email',
+                          valueField: 'email',
+                          labelWidth: 100,
+                          fieldLabel: 'Forward to',
+                          name: 'forwardToMail',
+                          width: 300
+                        });
+
+                      }
+                    }
+                  }
+                ]
+              }).show();
+            }
+          }
+        },
+        {
+          xtype: 'button',
+          text: 'Deliver',
+          icon: '/images/deliver.png',
+          handler: function () {
+            // find all highlighted messages
+            var selection = Ext.getCmp('messagegrid').getSelection();
+            selection.forEach(function (r, i) {
+              Ext.getCmp('messagegrid').deliverMessage(r);
+            });
+
+          }
+        },
+        {
+          xtype: 'button',
           text: 'Settings',
           icon: '/images/cog.png',
           handler: function () {
@@ -215,7 +315,7 @@ Ext.define('MailViewer.MessageGrid', {
                         var values = form.getValues();
                         stateManager.set('enableChromeNotifications', values.enableChromeNotifications);
                         stateManager.set('enableNotifications', values.enableNotifications);
-                        button.up('.window').close();
+                        button.up('window').close();
                       }
                     }
                   ],
@@ -319,6 +419,13 @@ Ext.define('MailViewer.MessageGrid', {
 
         },
         {
+          text: 'Delivered',
+          width: 150,
+          sortable: false,
+          renderer: this.formatDeliveryDate,
+          dataIndex: 'deliveryDate',
+        },
+        {
           text: 'Size',
           width: 100,
           resizable: false,
@@ -416,7 +523,7 @@ Ext.define('MailViewer.MessageGrid', {
          */
         var messageContainer = Ext.getCmp('messagecontainer');
         messageContainer.removeTab(record);
-        if(reload) {
+        if (reload) {
           view.getStore().reload();
           Ext.data.StoreMgr.lookup('originStore').reload()
         }
@@ -425,23 +532,23 @@ Ext.define('MailViewer.MessageGrid', {
       }
     });
   },
+  deliverMessage: function (record, dest) {
+    if (dest) {
+      record.set('_deliveryMail', dest);
+    } else {
+      record.set('deliveryDate', new Date());
+    }
+    record.save();
+    record.set('_deliveryMail', null);
+  },
   /**
    * Mark a message as read.
    * For some reason the PUT request in the store does not work correctly
    */
   setRead: function (record) {
-    if (record !== undefined) {
-      if (record.get('read') === false) {
-        Ext.Ajax.request({
-          url: '/messages/' + record.get('_id'),
-          method: 'PUT',
-          success: function (response) {
-            record.set('read', true);
-          }, failure: function () {
-            Ext.Msg.alert('Error', 'Couldn\'t mark message as read :-(');
-          }
-        });
-      }
+    if (record !== undefined && !record.get('read')) {
+      record.set('read', true);
+      record.save();
     }
   },
   onRowKeyDown: function (view, record, item, index, e) {
@@ -450,7 +557,7 @@ Ext.define('MailViewer.MessageGrid', {
       var that = this;
       var count = view.getSelectionModel().getSelection().length;
       view.getSelectionModel().getSelection().forEach(function (r, i) {
-        that.deleteMessage(view, r, (i == count-1));
+        that.deleteMessage(view, r, (i == count - 1));
       });
 
     }
@@ -502,6 +609,13 @@ Ext.define('MailViewer.MessageGrid', {
   },
   formatDate: function (date) {
     return Ext.Date.format(date, 'Y/m/d g:i a');
+  },
+  formatDeliveryDate: function (date) {
+    if (date) {
+      return Ext.Date.format(date, 'Y/m/d g:i a');
+    } else {
+      return 'Not delivered';
+    }
   },
   formatFrom: function (value, p, record) {
     if (value.name) {

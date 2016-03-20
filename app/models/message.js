@@ -49,8 +49,13 @@ var message = new Schema({
     type: Boolean,
     default: false
   },
+  deliveryDate: {
+    type: Date,
+    
+  },
   attachments: [
-    { type: Schema.Types.ObjectId,
+    {
+      type: Schema.Types.ObjectId,
       ref: 'attachment'
     }
 
@@ -59,11 +64,11 @@ var message = new Schema({
     type: Number
   }
 }, {
-  toObject: { virtuals: true },
-  toJSON: { virtuals: true }
+  toObject: {virtuals: true},
+  toJSON: {virtuals: true}
 });
 
-message.index({ source: 'text' });
+message.index({source: 'text'});
 
 message.methods.addAttachment = function (attachment, cb) {
   var _this = this;
@@ -77,7 +82,7 @@ message.methods.addAttachment = function (attachment, cb) {
 };
 
 message.pre('remove', function (next) {
-  this.model('attachment').remove({ _id: {$in: this.attachments}}, function (err) {
+  this.model('attachment').remove({_id: {$in: this.attachments}}, function (err) {
     if (err) {
       return next(err);
     }

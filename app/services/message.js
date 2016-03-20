@@ -42,6 +42,46 @@ module.exports = function (models) {
           return done(null, savedMessage);
         }
       });
+    },
+    relay: function (message, to, settings) {
+      
+      
+      var mail = {
+        from: message.from,
+        to: [],
+        subject: message.subject,
+        text: message.plain,
+        html: message.html,
+        cc: message.ccs,
+        headers: message.headers,
+        attachments: []
+      };
+      
+      
+      
+      if(to) {
+        mail.to = to;
+      } else {
+        message.recipients.forEach(function(e) {
+          if(e.name) {
+            mail.to.push(e.name + ' <'+e.address+'>');
+          } else {
+            mail.to.push(e.address);
+          }
+        });
+      }
+      message.attachments.forEach(function(a) {
+        mail.attachments.push({
+          filename: a.name,
+          content: a.content,
+          contentType: a.contentType,
+        })
+      });
+      
+      console.info('Relaying message '+ message._id + ' to ', mail.to);
+      settings.smtpRelay.transporter.sendMail(mail);
     }
   };
+
+
 };

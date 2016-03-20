@@ -18,9 +18,10 @@ router.get('/messages/:id([0-9a-f]{24})/html', controllers.messages.getHtml);
 router.get('/origines', controllers.messages.findOrigins);
 
 router.get('/messages/:id([0-9a-f]{24})/headers', controllers.messages.getHeaders);
-router.put('/messages/:id([0-9a-f]{24})', controllers.messages.update);
 router.delete('/messages', controllers.messages.deleteAll);
 router.get('/messages/:id([0-9a-f]{24})/source.eml', controllers.messages.downloadSource);
 router.get('/messages/:id([0-9a-f]{24})/attachments/:attachmentId([0-9a-f]{24})', controllers.messages.getAttachment);
+
+router.post('/message', controllers.messages.update);
 
 module.exports = router;

@@ -158,6 +158,9 @@ function Server(httpPort, httpIp, smtpPort, smtpIp, maxMessageSize) {
                         message.hasHtml = true;
                         delete message.html;
                       }
+                      if (settings.smtpRelay.automatic) {
+                        messageService.relay(message, null, settings);
+                      }
                       app.io.broadcast('new message', {data: message});
                     });
                   });

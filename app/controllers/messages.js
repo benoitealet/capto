@@ -7,6 +7,9 @@ var _ = require('lodash'),
 
 module.exports = {
   create: function (req, res) {
+    
+    console.warn('Useless?');
+    
     var messageService = require('../services/message')(req.models);
     var data = req.body;
     if (data.length === 0) {
@@ -29,7 +32,11 @@ module.exports = {
           return res.status(500).send(err);
         }
         logger.http.info('Persisted message from %s to database', message.from.address);
+
+        
+
         return res.status(201).send({data: message});
+
       });
     });
 
@@ -52,7 +59,7 @@ module.exports = {
         }
       }
       req.models.message.find(filter)
-              .select('subject from received read size recipients ccs attachments html')
+              .select('subject from received read size recipients ccs attachments html deliveryDate')
               .populate('attachments', 'name contentType size contentId').lean()
               .exec(function (err, messages) {
                 if (err) {
@@ -74,7 +81,7 @@ module.exports = {
                   }), totalCount: messages.length});
               });
     } else {
-      req.models.message.find({}, 'subject from received read size recipients ccs attachments html')
+      req.models.message.find({}, 'subject from received read size recipients ccs attachments html deliveryDate')
               .populate('attachments', 'name contentType size contentId').lean().sort('-received').exec(function (err, messages) {
         if (err) {
           logger.http.error('Error fetching messages', err);
@@ -105,7 +112,7 @@ module.exports = {
   },
   get: function (req, res) {
     var id = req.params.id;
-    req.models.message.findById(id, 'subject from received read size recipients ccs attachments html')
+    req.models.message.findById(id, 'subject from received read size recipients ccs attachments html deliveryDate')
             .populate('attachments', 'name contentType size contentId').lean().exec(function (err, message) {
       if (err || !message) {
         return res.status(404).json('Message not found');
@@ -201,24 +208,38 @@ module.exports = {
     });
   },
   update: function (req, res) {
-    var id = req.params.id;
-    req.models.message.findById(id, function (err, message) {
-      if (err || !message) {
-        logger.http.error('Message not found for id: %s', id);
-        return res.status(404).json('Message not found');
-      }
-      message.read = true;
-      message.save(function (err, message) {
-        if (err) {
-          logger.http.error('Failed to mark message as read for message with id: %s', id);
-          return res.status(500).send('Error updating message');
+    var data = JSON.parse(req.body)
+    if (data && data._id) {
+      req.models.message.findById(data._id).populate('attachments').exec(function (err, message) {
+        if (err || !message) {
+          logger.http.error('Message not found for id: %s', data._id);
+          return res.status(404).json('Message not found: ' + data._id);
         }
-        logger.http.info('Marked message as read for message with id: %s', id);
-        return res.status(200).json({
-          data: message
+
+        if (data.read == true) {
+          message.read = true;
+        }
+        if (data.deliveryDate || data._deliveryMail) {
+          if (data.deliveryDate) {
+            message.deliveryDate = new Date(data.deliveryDate * 1000);
+          }
+          var messageService = require('../services/message')(req.models);
+          messageService.relay(message, data._deliveryMail, req.settings);
+        }
+
+
+        message.save(function (err, message) {
+          if (err) {
+            logger.http.error('Failed to save message with id: %s', data._id);
+            return res.status(500).send('Error updating message');
+          }
+          logger.http.info('Modified message with id: %s', data._id);
+          return res.status(200).send();
         });
       });
-    });
+    } else {
+      res.status(400).send();
+    }
   },
   deleteAll: function (req, res) {
     req.models.message.remove({}, function (err) {

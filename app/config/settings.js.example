@@ -1,4 +1,6 @@
 'use strict';
+var sendmailTransport = require('nodemailer-sendmail-transport');
+var transporter = nodemailer.createTransport(sendmailTransport());
 
 var settings = {
   database: {
@@ -16,6 +18,10 @@ var settings = {
   http: {
     port: 9024,
     ip: '127.0.0.1'
+  },
+  smtpRelay: {
+    transporter: transporter,
+    automatic: false
   }
 };
 
