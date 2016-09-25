@@ -77,7 +77,7 @@ message.methods.addAttachment = function (attachment, cb) {
       return cb('Error creating attachment');
     }
     _this.attachments.push(attachment);
-    _this.save(cb);
+    cb();
   });
 };
 

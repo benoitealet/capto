@@ -36,7 +36,10 @@ module.exports = function (models) {
               logger.error('Error creating attachments for message', err);
               return done(err);
             }
-            return done(null, savedMessage);
+            savedMessage.save(function() {
+                done(null, savedMessage);
+            });
+            
           });
         } else {
           return done(null, savedMessage);
